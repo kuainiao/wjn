@@ -1,0 +1,162 @@
+﻿yum -y install yasm gcc gcc-c++
+git clone https://git.ffmpeg.org/ffmpeg.git ffmpeg
+cd ffmpeg/
+./configure 
+make
+make install
+
+
+
+
+yasm需要到官网上下载好源代码，解压后手动编译安装：
+
+./configure
+make
+make install
+
+在编译过程中，大部分的代码都是通过这种方式编译的。
+
+到官网下载X264的源代码，编译：
+
+./configure --prefix=/usr --enable-shared<span style="white-space:pre"> </span>//必须指定prefix位置，否则编译ffmpeg的时候会提示找不到libx264
+make
+make install
+
+第四部是安装ffmpeg的其他依赖库，通过两条命令完成：
+
+sudo apt-get update
+sudo apt-get install build-essential subversion git-core checkinstall yasm texi2html libfaac-dev libfaad-dev libmp3lame-dev libsdl1.2-dev libtheora-dev libx11-dev libxvidcore4-dev zlib1g-dev
+
+最好，到ffmpeg官网下载ffmpeg的源代码，解压，编译
+
+./configure --enable-gpl --enable-nonfree --enable-pthreads --enable-libfaac --enable-libmp3lame --enable-libtheora --enable-libx264 --enable-libxvid --enable-x11grab --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopencore-amrnb --enable-version3 --disable-optimizations --disable-asm
+make
+make install
+
+
+
+
+
+
+Linux下ffmpeg的完整安装
+最近在做一个企业项目, 期间需要将用户上传的视频转成flv格式或mp4格式并用flash插件在前端播放, 我决定采用ffmpeg (http://www.ffmpeg.org/ )实现. 当然以前也用过ffmpeg, 但是没有安装额外的库, 只是源代码下简单地 ./configure, 最后发现好多功能都用不了, 比如最流行的x264编码器. 所以决心完整地安装一下ffmpeg, 经过两天痛苦地折腾, 终于成功了, 现在将过程记录下来. 主要参考了 [1] 和 [2] 两篇博文, 其中 [1] 是2007年写成的, 其中所提到的依赖库版本比较老, 本人安装的都是相应最新的版本.
+
+ 
+
+首先要安装各种解码器 
+
+1、lame 
+lame-3.99.5.tar.gz 
+Url：http://sourceforge.net/project/showfiles.php?group_id=290&package_id=309 
+安装方法如下：
+
+1     tar -zxvf lame-3.99.5.tar.gz  
+2     cd lame-3.99.5  
+3     ./configure --enable-shared 4     make  
+5     make install  
+2、libogg 
+libogg-1.3.1.tar.gz 
+Url：http://www.xiph.org/downloads/ 
+安装方法如下：
+
+3、libvorbis 
+libvorbis-1.3.3.tar.gz 
+Url：http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.gz
+
+(libvorbis依赖于libogg, 所以libogg必须先于libvorbis安装)
+安装方法如下：
+
+1     ./configure 2     make  
+3     make install  
+4、xvid 
+xvidcore-1.3.2.tar.gz 
+Url：http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz 
+安装方法如下：
+
+5、x264 
+latest_x264.tar.bz2 (其中包含的目录是 x264-snapshot-20131023-2245) 
+Url：http://www.videolan.org/developers/x264.html 
+ftp://ftp.videolan.org/pub/videolan/x264/snapshots/ 
+安装方法如下：
+
+1 　　　tar -jxvf latest_x264.tar.bz2
+2     ./configure  
+3     make  
+4     make install  
+ 
+
+6、libdts 
+libdca-0.0.5.tar.bz2
+Url: http://www.videolan.org/developers/libdca.html
+安装方法：
+
+7、a52 
+a52dec-0.7.4.tar.gz           (这个库从2002年就没有更新过了)
+http://liba52.sourceforge.net/downloads.html       
+安装方法：
+
+8、faad2 
+faad2-2.7.tar.gz 
+http://www.audiocoding.com/downloads.html 
+安装方法
+
+9、faac 
+faac-1.28.tar.gz 
+http://www.audiocoding.com/downloads.html
+安装方法：
+
+10、amr-nb 
+amrnb-10.0.0.0.tar.bz2 
+http://ftp.penguin.cz/pub/users/utx/amr/ ( 从此处下载最新版本 )
+安装方法：
+
+11、amr-wb 
+amrwb-7.0.0.1.tar.bz2 
+http://ftp.penguin.cz/pub/users/utx/amr/ ( 从此处下载最新版本 )
+安装方法：
+
+1     ./configure 2     make  
+3     make install  
+
+12、最关键的一步, 安装ffmpeg
+
+1   ./configure --prefix=/usr/local/ffmpeg2 --enable-libmp3lame --enable-libvorbis --enable-gpl --enable-version3 --enable-nonfree --enable-pthreads --enable-libfaac --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libx264 --enable-libxvid --enable-postproc --enable-ffserver --enable-ffplay
+2   make  
+3   make install  
+ 在./configure的时候会报错, 提示说没有libopencore-amrnb和libopencore-amrwb两个库. 我参考了 [2], 使用如下命令安装它们:
+
+sudo apt-get install libopencore-amrnb-dev libopencore-amrwb-dev
+ 如果./configure的时候加入 --enable-shared, 编译安装没有问题. 但是运行ffmpeg命令就会出错:
+
+ relocation error: /usr/local/lib/libavfilter.so.3: symbol sws_get_class, version LIBSWSCALE_2 not defined in file libswscale.so.2 with link time reference；
+ 这时可以参考 [3], 大意是说跟gstreamer的动态库冲突了, 要卸载gstreamer. 但是如果卸载了gstreamer我的多媒体软件多不能用了. 所以我卸载了ffmpeg并重新编译成静态库. 安装完之后, 运行ffmpeg成功, 输出如下:
+
+ffmpeg version 2.0.1 Copyright (c) 2000-2013 the FFmpeg developers                                                      
+  built on Oct 25 2013 17:40:51 with gcc 4.6 (Ubuntu/Linaro 4.6.3-1ubuntu5)                                              
+  configuration: --prefix=/usr/local/ffmpeg2 --enable-libmp3lame --enable-libvorbis --enable-gpl --enable-version3 --enable-nonfree --enable-pthreads --enable-libfaac --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libx264 --enable-libxvid --enable-postproc --enable-ffserver --enable-ffplay
+  libavutil      52. 38.100 / 52. 38.100
+  libavcodec     55. 18.102 / 55. 18.102
+  libavformat    55. 12.100 / 55. 12.100
+  libavdevice    55.  3.100 / 55.  3.100
+  libavfilter     3. 79.101 /  3. 79.101
+  libswscale      2.  3.100 /  2.  3.100
+  libswresample   0. 17.102 /  0. 17.102
+  libpostproc    52.  3.100 / 52.  3.100
+Hyper fast Audio and Video encoder
+usage: ffmpeg [options] [[infile options] -i infile]... {[outfile options] outfile}...
+ 
+
+ 
+
+[1] http://yezi.iteye.com/blog/139399
+
+[2] http://www.learndiary.com/2011/04/ubuntu-linux-%E4%B8%8B-ffmpeg-%E5%8F%8A-mencoder-%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E5%B0%8F%E7%BB%93/
+
+[3] http://blog.csdn.net/nil_foc/article/details/6547047
+
+
+
+
+
+
+ffmpeg -i rtmp://9463.liveplay.myqcloud.com/live/9463_fcfa70cd3ad411e791eae435c87f075e -c:a copy   -f flv rtmp://9463.livepush.myqcloud.com/live/9463_a6edbb4a3ae711e791eae435c87f075e?bizid=9463
