@@ -1,0 +1,5 @@
+---
+- hosts: web
+  tasks:
+  - name: the bakup
+    command: nohup tar zcvf /opt/logs.tar.gz /opt/tomcat/logs &

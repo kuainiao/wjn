@@ -1,0 +1,9 @@
+---
+- hosts: web
+  tasks:
+  - name: stop tomcat
+    command: /opt/tomcat/bin/shutdown.sh
+  - name: Copy ansible inventory file to client
+    copy: src=/root/hd-manager.war dest=/opt/tomcat/webapps/ owner=root group=root mode=0644
+  - name: start tomcat
+    command: nohup /opt/tomcat/bin/startup.sh &

@@ -1,0 +1,5 @@
+---
+- hosts: web
+  tasks:
+  - name: delete file in client
+    file: dest=/root/ansible-tower-setup-latest.tar.gz state=absent

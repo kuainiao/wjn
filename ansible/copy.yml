@@ -1,0 +1,5 @@
+---
+- hosts: web
+  tasks:
+  - name: Copy ansible inventory file to client
+    copy: src=/root/ansible-tower-setup-latest.tar.gz dest=/root owner=root group=root mode=0644
