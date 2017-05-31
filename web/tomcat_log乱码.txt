@@ -1,0 +1,15 @@
+问题
+
+在Tomcat中有时输出的日志中文为乱码，包括控制台窗口和输出日志文件中都为乱码。
+
+解决方案
+
+JDK引用的设置
+
+Java引用参数添加"-Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8"
+
+将上面参数添加到Catalina.sh中JAVA_OPTS变量中，重启Tomcat，OK了。
+
+
+
+JAVA_OPTS="$JAVA_OPTS $JSSE_OPTS -Dfile.encoding=UTF8 -Dsun.jnu.encoding=UTF8"
