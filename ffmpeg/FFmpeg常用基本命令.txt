@@ -143,3 +143,7 @@ done
 
 保存为本地文件：
 ffmpeg -i http://9463.liveplay.myqcloud.com/live/9463_fcfa70cd3ad411e791eae435c87f075e.m3u8  out.flv
+
+
+
+ffmpeg -re -i six.flv -c copy -f flv rtmp://pub1.streaming.youku.com/live2play/ibu0603?auth_key=1527730886-0-0-0c2bb6ec1c8f53564cd56ce4c763498c
