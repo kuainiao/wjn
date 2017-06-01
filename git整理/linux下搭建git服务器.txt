@@ -1,5 +1,6 @@
 1、linux下创建git仓库
 mkdir android.git
+chown -R git:git android.git/
 git init --bare android.git
 2、客户端执行clone
 git clone git@192.168.1.17:/opt/git/songshan/source/android/android.git/

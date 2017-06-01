@@ -1,0 +1,166 @@
+ 鼓捣媒体的人对FFmpeg应该不会陌生，它不仅功能强大，结构优美，灵活、易扩展，也是很其他多媒体播放器的基础，例如VLC，Mplayer等等，还有好多商业播放器都用了ffmpeg，但这些商业软件却没有遵守GPL公约，所以它们都被钉在了ffmpeg官网的“耻辱柱”上。关于ffmpeg还有一点题外话，那就是有一个叫做libav的开源项目。libav是从ffmpeg分化出来的一个项目，而这个项目诞生的原因和技术本身并没有任何关系，最大的分歧在于ffmpeg内部有一帮人对于ffmpeg项目的管理方式觉得不happy了，所以他们就自立门户，成立了libav这个项目。有意思的是libav官网的logo和ffmpeg官网的logo有点“小过节”，libav把ffmpeg官网那个偏着脑袋的logo给端正了，至于他们想传达的意义我觉得每个人都应该有自己的理解和认识。好了，开场预热就到这里，该干活了。
+   CentOS6.4的内核版本2.6.32-358，GCC版本是4.4.7，安装ffmpeg的版本是1.2，ffmpeg官网最新的版本是2.1，看着版本号差异挺大，其实从1.2到2.1中间仅隔了一个2.0版，是2013年7月10号刚发布。
+   安装前的准备工作当然是先安装各种工具：
+
+点击(此处)折叠或打开
+[root@localhost src]# pwd
+/usr/local/src
+[root@localhost src]# yum install automake autoconf make gcc gcc-c++ libtool zlib zlib-devel curl curl-devel alsa-lib alsa-lib-devel gettext gettext-devel expat expat-devel
+   ffmpeg作为一个多媒体框架和平台，最大的优势就在于可以很灵活地支持多种编解码和其他特性，只要第三方外部库支撑都可以做到。本次安装下列第三包依赖包：
+   faac：全称是Free Advanced Audio Coder，是MPEG-4和MPEG-2 AAC的一款常用的开源编解码器；
+   lame：一款常见的mp3的开源编解码器；
+   libass：先说一下ASS/SSA，其全称是Advanced Substation Alpha/Substation Alpha，是一种功能极为强大的字幕格式，主要用在视频文件里显示字幕。而libASS是一个轻量级的对ASS/SSA格式字幕进行渲染的函数库，使用C编写,效率非常高；
+   libdc1394：这是面向高级语言编程接口的一个库，主要提供了对符合IEEE 1394规范的数码摄录设备的一组操作接口。符合1395规范的数码相机标准的全称是1394-based Digital Camera Specifications，简称为IIDC或DCAM。安装dc1394需要先安装raw1394；
+   libfreetype2：freetype是一个用C语言实现的一个字体光栅化库，它可以用来将字符栅格化并映射成位图以及提供其他字体相关业务的支持。freetype提供了一个简单、易用并统一的接口来访问字体文件的内容。freetype不仅被自由桌面系统软件所使用，同时它也是现代视频游戏广泛使用的栅格化引擎；
+   libvorbis：这个库主要用于处理ogg格式的音频文件，而ogg全称是ogg vorbis，一种类似mp3的音频压缩格式。不同于mp3的是ogg完全免费、开放和没有专利限制的。ogg文件格式可以不断地进行大小和音质的改良，而不影响旧有的编码器或播放器，主要由Xiph.org基金会开发；
+   libtheora：theora也是Xiph.org基金会开发，是一种有损的影像压缩格式；
+   openssl：这个就不多说了，很多安全框架的基础；
+   rtmpdump：一个开源的rtmp格式的流媒体库，RTMP(Real Time Messaging Protocol)是Adobe Systems公司为它自家的flash播放器和服务器之间音频、视频和数据传输开发的一种开放的传输协议；
+   speex：speex是一套主要针对语音的开源免费、无专利保护的音频压缩格式，致力于通过提供一个可以替代高性能语音编解码来降低语音应用输入门槛。相对于其它编解码器，speex非常适合网络应用，因为它专为2-44kpbs语音码流所设计，所以在网络应用上有着自己独特的优势；
+   twolame：一个开源的mp2格式的编解码库；
+   vo-aacenc：AAC格式的常用的音频编码器；
+   xvidcore：是一个开放源代码的MPEG-4视频编解码器；
+   x264：目前最流行，最常见的H.264视频格式的一个开源的编解码器；
+
+   将需要的软件包全部下载后，剩下的事儿就非常简单：“三大步”---configure && make && make install
+   安装顺序如下：faac、lame、libtheora(需要先安装libogg)、libvorbis、vo-aacenc、xvidcore、x264、libdc1394(需要先安装libraw1394)、libass(需要先依次安装libfreetype2、fribidi和fonconfig)、openssl、librtmp、libspeex、twolame、yasm，最后安装ffmpeg。
+
+   在通过源码包安装上述软件时，如果在configure阶段没有用--prefix指定安装目录，默认情况下安装的顶级目录是/usr/local，可执行程序会被安装到/usr/local/bin，动态库被安装到/usr/local/lib，头文件在/usr/local/include等等。这样会有一个小小的麻烦，例如当先安装libogg后，再安装libtheora时，你有可能会收到如下的错误提示信息：
+checking pkg-config is at least version 0.9.0... yes
+checking for OGG... no
+checking for Ogg... no
+*** Could not run Ogg test program, checking why...
+*** The test program compiled, but did not run. This usually means
+*** that the run-time linker is not finding Ogg or finding the wrong
+*** version of Ogg. If it is not finding Ogg, you'll need to set your
+*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point
+*** to the installed location  Also, make sure you have run ldconfig if that
+*** is required on your system
+***
+*** If you have an old version installed, it is best to remove it, although
+*** you may also be able to get things to work by modifying LD_LIBRARY_PATH
+configure: error:
+    libogg is required to build this package!
+    please see http://www.xiph.org/ for how to
+    obtain a copy.
+
+
+   明明安装了ogg但theora却认为咱们没安装。原因在哪里，当然是动态库的查找路径了，想了解详情的童鞋请移步这里。我的解决办法是在 /etc/ld.so.conf.d/目录下创建一个名为local-libraries.conf的文件，内容很简单，只有一行：
+
+点击(此处)折叠或打开
+[root@localhost src]# cat /etc/ld.so.conf.d/local-libraries.conf
+/usr/local/lib
+[root@localhost src]#
+
+   然后执行ldconfig -v，然后再安装libtheora就很happy了。
+   当然还没完，当你在安装libass时，当你把所有依赖包都先安装之后，在configure阶段，它总会提醒你说：
+Package requirements (freetype2 >= 9.10.3) were not met
+
+   任凭你怎么执行ldconfig都没用。不过你要是注意到错误提示信息其实问题的解决也就挺简单，在configure阶段在探测依赖包时用到了一个叫做pkg-config的工具，它会自动去查找当前系统是否支持某些类型的动态库文件，主要是通过一个*.pc文件。而一些标准so库源码包里都会提供一个这样的文件以便pkg-config来用，而问题就在pkg-config查找*.pc文件的路径上。关于这个工具更多细节就不展开了，感兴趣的朋友可以去google一下。这里我的解决办法是：
+
+点击(此处)折叠或打开
+[root@localhost libass-0.10.1]# export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH
+    然后安装libass时也就很happy了。
+    最后，在安装ffmpeg前需要先安装yasm，版本至少1.2.0以上。
+
+    下面是我的安装ffmpeg时相关软件包的配置情况，以便各位参考：
+1 faac 
+[root@localhost faac]#./bootstrap
+[root@localhost faac]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost faac]#make && make install
+
+
+2 lame
+[root@localhost lame-3.98.4]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost lame-3.98.4]#make && make install
+
+
+3 libogg
+[root@localhost libogg-1.3.0]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost libogg-1.3.0]#make && make install
+
+
+4 libtheora
+[root@localhost libtheora-1.1.1]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost libtheora-1.1.1]#ldconfig -v
+[root@localhost libtheora-1.1.1]#make && make install
+
+
+5 libvorbis
+[root@localhost libvorbis-1.3.3]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost libvorbis-1.3.3]#make && make install
+
+
+6 vo-aacenc
+[root@localhost vo-aacenc-0.1.2]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost vo-aacenc-0.1.2]#make && make install
+
+
+7 xvidcore
+[root@localhost xvidcore-1.3.2]#./configure --prefix=/usr/local/ 
+[root@localhost xvidcore-1.3.2]#make && make install
+
+
+8 yasm
+[root@localhost yasm-1.2.0]#./configure --prefix=/usr/local/ 
+[root@localhost yasm-1.2.0]#make && make install
+
+
+9 x264
+[root@localhost x264-snapshot-20130505-2245]#./configure --prefix=/usr/local/ --enable-shared --enable-pic
+[root@localhost x264-snapshot-20130505-2245]#make && make install
+
+
+10 libraw1394
+[root@localhost libraw1394-2.0.5]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost libraw1394-2.0.5]#make && make install
+
+
+11 libdc1394
+[root@localhost libdc1394-2.2.1]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost libdc1394-2.2.1]#make && make install
+
+
+12 libfreetype
+[root@localhost libfreetype2-master]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost libfreetype2-master]#make && make install
+
+
+13 fribidi
+[root@localhost fribidi-0.19.4]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost fribidi-0.19.4]#make && make install
+
+
+14 fonconfig
+[root@localhost fontconfig-2.9.0]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost fontconfig-2.9.0]#make && make install
+
+
+15 libass
+[root@localhost libass-0.10.1]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost libass-0.10.1]#make && make install (xuyao )
+
+
+16 openssl
+[root@localhost openssl-1.0.1c]#./config --prefix=/usr/local/ --openssldir=/usr/local/openssl threads zlib-dynamic shared
+[root@localhost openssl-1.0.1c]#make && make install
+
+
+17 librtmp
+[root@localhost rtmpdump-2.3]#make SYS=posix
+[root@localhost rtmpdump-2.3]#make install
+
+
+18 libspeex
+[root@localhost speex-1.2rc1]#./configure --prefix=/usr/local/ --enable-shared --enable-sse
+[root@localhost speex-1.2rc1]#make && make install
+
+
+19 twolame
+[root@localhost twolame-0.3.13]#./configure --prefix=/usr/local/ --enable-shared
+[root@localhost twolame-0.3.13]#make && make install
+
+
+20 FFmpeg
+[root@localhost ffmpeg-1.2]#./configure --prefix=/usr/local/ --enable-gpl --enable-version3 --enable-nonfree --enable-shared --enable-zlib --enable-bzlib --enable-libfaac --enable-libmp3lame --enable-libtheora --enable-libvo-aacenc --enable-libvorbis --enable-libx264 --enable-libxvid --enable-pic --enable-pthreads --enable-libdc1394 --enable-libass --enable-pic --enable-openssl --enable-libtwolame --enable-libspeex --enable-librtmp --enable-libfreetype 
+[root@localhost ffmpeg-1.2]#make && make install
