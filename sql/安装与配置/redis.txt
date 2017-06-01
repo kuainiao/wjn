@@ -1,0 +1,90 @@
+redis(noSQL数据库）
+基于内存，硬盘备份
+功能比memcached多
+数据类型比memcached多
+支持主从
+0
+
+1.安装redis数据库
+#tar -xzf redis-3.0.6.tar.gz
+#cd  redis-3.0.6
+#make
+#make install
+#./utils/install_server.sh
+
+
+2.快速测试使用：
+
+set 可以新建覆盖修改
+ set string1 hello xx 
+ setrange string1 6 "Redis"  
+
+#redis-cli
+>set my  1111
+>setrange my 2 xx
+>setbit  my  1 1
+
+setbit(设置位)
+setbit  tom123  3000  1
+setbit  tom123  3030   234
+
+hash表
+tom
+电话:137
+年龄:18
+性别:女
+爱好:xxx,
+
+hset lily  phone '137'
+hset lily  age '18'
+hset lily  favor 'haha'
+参考案例操作具体数据库指令
++++++++++++++++++++
+
+redis
+make && make install
+./util/install_server.sh
+redis-server
+redis-cli
+string   set  get
+hash     hmset  hmget
+list        lpush
+set
+
+实验：redis主从同步
+主服务器操作
+#tar -xzf redis-3.0.6.tar.gz 
+#make && make install
+#./utils/install_server.sh
+1.配置主服务器密码
+#vim  /etc/redis/6379.conf
+... ...
+requirepass  123456
+#service redis_6379  restart  
+//成功
+##service redis_6379  restart  
+//提示错误
+#vim  /etc/init.d/redis_6379
+$CLIEXEC -a 123456 -p $REDISPORT shutdown
+
+从服务器设置：
+#tar -xzf redis-3.0.6.tar.gz 
+#make && make install
+#./utils/install_server.sh
+#vim  /etc/redis/6379.conf
+slaveof 192.168.2.10 6379
+//与主服务器192.168.2.10同步数据
+//端口是6379
+masterauth 123456
+//主服务器的密码
+#service  redis_6379  restart
+
+在从服务器上确定主服务器的数据是否通过过来
+#redis-cli		//连接本机
+#keys *
+
+
+
+
+
+

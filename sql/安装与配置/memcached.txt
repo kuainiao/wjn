@@ -1,0 +1,176 @@
+#yum -y install tiger-vnc
+#vncviewer 172.40.50.118:9
+
+memcached:
+NoSQL数据库，KV数据库，缓存数据库
+优点：简单,快
+缺点：功能少，数据丢失
+
+
+
+
+安装memcached
+#yum  -y install gcc
+#tar -xf libevent-2.0.21-stable.tar.gz
+#cd libevent-2.0.21-stable
+#./configure
+#make && make install
+
+#ln -s /usr/local/lib/libevent* /usr/lib/
+#ldconfig
+
+#tar -xf memcached-1.4.24.tar.gz
+#cd memcached-1.4.24
+#./configure
+#make && make install
+
+#memcached -h
+#memcached -d -u root -m 64 
+#netstate -ntulp |grep 11211
+
+#yum -y install  telnet
+#telnet 127.0.0.1 11211
+
+
+客户---网站---登录[代码]---数据库
+
+memcached  临时数据，永久数据
+
+永久数据一定要存储在SQL数据库中
+memcached目的，缓存这些数据
+
+
+memcached的数据什么时候会丢失
+1.服务重启
+2.计算机重启
+3.数据过期
+4.delete或者fluash_all
+5.LRU
+
+
+++++++++++++++++++++++++++++
+PHP--->memcached
+++++++++++++++++++++++++++++
+注意：memcache安装要安装在有PHP的主机
+
+memcache是一个PHP的扩展库文件
+
+
+#tar -xf memcache-2.2.5.tgz
+#cd memcache-2.2.5
+
+#/usr/local/php5/bin/phpize .
+#./configure
+#make && make install
+
+
+#sed -i '728i extension_dir = "/usr/local/php5/lib/php/extensions/no-debug-non-zts-20100525/"' /usr/local/php5/etc/php.ini
+
+#sed -i '856i extension=memcache.so' /usr/local/php5/etc/php.ini
+
+
+给PHP安装memcache扩展以后，PHP就可用支持连接memcached服务器
+
+#vim /usr/local/nginx/html/test.php
+<?php
+$memcache=new Memcache;
+//创建memcache对象
+$memcache->connect('localhost',11211) or die ('could not connect!! ');
+$memcache->set('key', 'test');
+//定义变量
+$get_values=$memcache->get('key');
+//获取变量值
+echo $get_values;
+?>
+
+#service  php-fpm  restart
+
+
+排错：
+1.nginx是否启动
+2.nginx是否通过fastcgi_pass连接PHP
+3.PHP是否启动service php-fpm start
+4.PHP是否安装了memcache扩展，并调用了该扩展，并重启PHP
+6.test.php是否有语法错误
+7.memcached启动服务
+用户->nginx->PHP->memcache->memcached   
+日志:nginx/logs/error.log
+
+
+++++++++++++++++++++++++++++++++
+client:192.168.4.100  eth0
+nginx: 192.168.4.5    eth0  nginx
+       192.168.2.5    eth1
+tomcat1:192.168.2.100 eth1  tomcat
+tomcat2:192.168.2.200 eth1  tomcat
+
+负载均衡,后台从httpd换成tomcat
+
+1.nginx负载均衡
+#vim nginx/conf/nginx.conf
+  upstream tom {
+    server 192.168.2.100:8080;
+    server 192.168.2.200:8080;
+  }
+  server {
+     listen 80;
+     server_name localhost;
+     location / {
+        proxy_pass http://tom;
+        ...
+      }
+   }
+#nginx -s reload
+
+
+2.安装启动tomcat
+  <使用脚本或手动安装>
+#/usr/local/tomcat/bin/catalina.sh start
+
+
+++++++++++++++++++++++++++++++
+实验:使用memcached保存会话信息
+
+以下操作，需要在两台tomcat都执行
+
+1.创建java页面，显示sessionID
+#cat /usr/local/tomcat/webapps/ROOT/test.jsp
+<html>
+<body bgcolor="green">
+<center>
+<%String s = session.getId();%>
+<%=s%>
+<h1>tomcatA </h1>
+</center>
+</body>
+</html>
+
+
+2.让tomcat连接memcached
+需要给tomcat安装扩展库文件
+#cd lnmp_soft/session/
+#cp *.jar  /usr/local/tomcat/lib/
+
+
+3.编写tomcat的context.xml文件，指定memcached的IP和端口
+
+#cd lnmp_soft/session
+#cp context.xml  /usr/local/tomcat/conf/
+
+#vim /usr/local/tomcat/conf/context.xml
+... ...
+memcachedNodes="mem1:192.168.2.100:11211"
+将IP修改为启动了memcached服务那台主机的IP地址
+#/usr/local/tomcat/bin/catalina.sh stop
+#/usr/local/tomcat/bin/catalina.sh start
+
+
+
+
+
+
+
+
+
+
+

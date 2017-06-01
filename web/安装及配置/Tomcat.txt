@@ -1,0 +1,138 @@
+盗链
+referer：www.redhatedu.com
+新网站：www.redhatedu.com
+聚合：搜索
+
+
+链接：youku， 短片
+     tudou，
+      aiqiyi  电影
+    腾讯  动画
+
+
+
+
+Tomcat--》java
+
+#rpm -ivh jdkXXXXX
+#tar -xf apache-tomcatXXXXX
+#mv apache-tomcat /usr/local/tomcat
+#ls /usr/local/tomcat
+
+#/usr/local/tomcat/bin/catalin.sh start
+
+
+Tomcat配置文件语法格式
+<server>
+   <service>
+      <connector port=8080/>
+      <connector port=8000/>
+        <engine default=a>
+          <host name=a> xx</host>
+          <host name=b> xxx</host>
+          <host name=c> xxx</host>
+        </engine>
+   </service>
+</server>
+
+
+实验1：虚拟主机
+#vim /usr/local/tomcat/conf/server.xml
+... ...
+   <Host name="www.a.com"  appBase="a" unpackWARs="true" autoDeploy="true">
+   </Host>
+   <Host name="www.b.com"  appBase="b" unpackWARs="true" autoDeploy="true">
+   </Host>
+#cd /usr/local/tomcat
+#mkdir -p {a,b}/ROOT
+#echo "AA" > a/ROOT/index.html
+#echo "BB" > b/ROOT/index.html
+#/usr/local/tomcat/bin/catalina.sh stop
+#/usr/local/tomcat/bin/catalina.sh start
+
+客户端验证：
+#vim /etc/hosts
+192.168.2.100  www.a.com  www.b.com
+
+#firefox http://www.a.com:8080
+#firefox http://www.b.com:8080
+
+
+
+++++++++++++++++++++++++
+
+实验2:
+    
+#vim /usr/local/tomcat/conf/server.xml
+... ...
+   <Host name="www.a.com"  appBase="a" unpackWARs="true" autoDeploy="true">
+  <Context path="" docBase="base" reloadable="true"/>
+   </Host>
+   <Host name="www.b.com"  appBase="b" unpackWARs="true" autoDeploy="true">
+   </Host>
+#cd /usr/local/tomcat
+#mkdir a/base
+#echo "base" > a/base/index.html
+
+#/usr/local/tomcat/bin/catalina.sh stop
+#/usr/local/tomcat/bin/catalina.sh start
+
+ 
+appBase=a     网站根路径
+docBase=XX	默认java项目
+path=用户地址栏
+
+
+
++++++++++++++++++++++++++++
+实验：tomcat加密网站
+
+1.生成私钥证书文件
+#keytool -genkeypair -alias tomcat -keyalg RSA -keystore /usr/local/tomcat/keystore
+根据提示：输入密码，国家，单位，部门登信息
+
+2.修改tomcat配置文件，启用加密功能
+#vim /usr/local/tomcat/conf/server.xml
+... ...
+<Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
+keystoreFile="/usr/local/tomcat/keystore" keystorePass="123456" clientAuth="false" sslProtocol="TLS" />
+开启150个线程，启用加密功能，协议头部为https,证书文件为/usr/local/tomcat/keystore，证书文件的密码为123456
+
+#/usr/local/tomcat/bin/catalina.sh stop
+#/usr/local/tomcat/bin/catalina.sh start
+
+
+客户端验证：
+#firefox https://www.a.com:8443
+
+
++++++++++++++++++++++++++++++
+tomcat进程优化:
+#vim tomcat/conf/server.xml
+... ...
+<Connector port=“8080“
+protocol="HTTP/1.1“
+maxThreads="1000“
+//最大线程数
+minSpareThreads="100“
+//最少空闲进程
+maxSpareThreads="1000“
+//最大空闲进程
+enableLookups="false“
+//不对客户端IP进行反向DNS解析
+URIEncoding="utf-8“
+//编码
+acceptCount="1000“
+//监听端口队列最大数
+/>
+
+
+调整Java虚拟机内存：
+#vim /usr/local/tomcat/bin/catalina.sh
+
+249行：添加如下内容jvm虚拟机的最小内存和最大内存修改为1024M
+JAVA_OPTS="-Djava.awt.headless=true -Dfile.encoding=UTF-8 -server -Xms1024m -Xmx1024m"
+
+
+

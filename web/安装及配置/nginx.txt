@@ -1,0 +1,259 @@
+安装Nginx
+#yum -y install gcc pcre-devel openssl-devel
+
+#tar -xzf  nginx-1.7.10.tar.gz
+#cd nginx-1.7.10
+#./configure \
+>--prefix=/usr/local/nginx \
+>--with-http_ssl_module
+#make && make install
+
+#ls /usr/local/nginx
+sbin/	主程序
+html/	页面文件
+logs/	日志和pid文件
+conf/	配置文件
+
+#/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+
+#PATH=$PATH:/usr/local/nginx/sbin
+#nginx 		启动
+#nginx -s stop	关闭
+#nginx -s reload	重新读取配置文件
+
+
+Nginx平滑升级
+#tar -xzf nginx-1.8.0.tar.gz
+#cd nginx-1.8.0
+#./configure \
+>--prefix=/usr/local/nginx \
+>--with-http_ssl_module
+#make
+
+#mv /usr/local/nginx/sbin/nginx  /usr/local/nginx/sbin/nginx.bak
+#cp objs/nginx /usr/local/nginx/sbin/
+#make upgrade
+
+
+++++++++++++++++++++++++
+Nginx的配置文件
+#vim /usr/local/nginx/conf/nginx.conf
+全局设置
+http{
+        server {
+	location {}
+	   }
+}
+
+
+实验一：
+添加一个虚拟机主机
+www.a.com
+www.b.com
+
+#vim   nginx.conf
+... ...
+http{
+        server {
+	listen 80;
+	server_name www.a.com;
+	location / {
+                        root   html;
+	        index index.html;
+	}
+	}
+	server {
+	listen 80;
+	server_name www.b.com;
+	location / {
+                        root   web;
+	        index index.html;
+	}
+	}
+	server {
+	listen default;
+	location / {
+                        root   default;
+	        index index.html;
+	}
+	}
+}
+#mkdir /usr/local/nginx/web
+#echo "web" >/usr/local/nginx/web/index.html
+#ngins -s reload
+
+
+客户端验证：
+#vim  /etc/hosts
+192.168.4.5  www.a.com  www.b.com
+#firefox  http://www.a.com
+#firefox  http://www.b.com
+
+
++++++++++++++++++++++++++
+Nginx的认证和访问控制
+#vim  nginx.conf
+... ...
+http{
+   server {
+      listen 80;
+      server_name www.a.com;
+      location / {
+        auth_basic "任意字串";
+        auth_basic_user_file "/usr/local/nginx/pass";
+         allow 172.16.0.1;
+         allow 172.16.0.2;
+         deny all;
+        root html;
+        index index.html;
+	}
+	}
+}
+#yum -y install httpd-tools
+#htpasswd -cm  /usr/local/nginx/pass  tom
+#nginx -s reload
+
+
+
+
+
+
+server {
+	listen 80;
+	server_name www.a.com;
+	auth_basic_user_file "pass";
+	location / {
+	    root html;
+	    inex index.html;
+	}
+	location   /test {
+	   allow 192.168.0.1;
+	  deny all
+	}
+
+}
+
+++++++++++++++++++++++++
+加密算法：
+1.对称算法des,aes...
+2.非对称算法rsa,dsa...
+3.哈希值md5,sha256...
+
+
+
+
+
+
+
+
+
+
+[实验：https]
+
+#cd /usr/local/nginx/conf/
+#openssl genrsa  -out my.key
+//生成私钥文件my.key
+#openssl req -new -x509 -key my.key -out my.crt
+//生成证书文件my.crt
+
+填写国家名称CN，省份，城市，公司名称，部门，备注，邮箱
+先操作：生成私钥，证书，默认1024位
+
+
+#vim  nginx.conf
+... ...
+server {
+        listen       443 ssl;
+        server_name  www.test.com;
+        ssl_certificate      my.crt;	    //证书
+        ssl_certificate_key  my.key;  //私钥
+	... ...
+	location / {
+            	root   sec;
+            	index  index.html index.htm;
+        	}
+    }
+#mkdir /usr/local/nginx/sec
+#echo "security page" > /usr/local/nginx/sec/index.html
+#nginx -s reload
+
+客户端测试:
+#vim /etc/hosts
+172.16.0.100    www.test.com
+#firefox   https://www.test.com
+
+
+
++++++++++++++++++++++++++
+实验[Nginx调度器]
+----------------------------------
+client:192.168.4.100	  eth0	 |
+----------------------------------
+nginx调度器:
+      192.168.4.5      eth0     |
+      192.168.2.5      eth1	 |
+---------------------------------
+web1:	192.168.2.100    eth1	 |
+web2:	192.168.2.200    eth1   |
+---------------------------------
+
+web1和web2做相同操作：
+#yum -y install httpd
+#service httpd start
+#echo "xx" >/var/www/html/index.html
+备注：两台web页面内容不同
+
+
+Nginx调度器设置：
+#tar -xzf nginx-1.8.0.tar.gz
+#cd nginx-1.8.0
+#./configure --prefix=/usr/local/nginx --with-http_ssl_module
+#make && make install
+
+#vim /usr/local/nginx/conf/nginx.conf
+... ...
+http{
+	upstream cluster {     //定义集群
+	server 172.16.0.100;
+	server 172.16.0.200;
+	}
+   server {
+	listen 80;
+	server_name localhost;
+	location / {
+	proxy_pass http://cluster;
+	}
+#nginx -s reload
+
+客户端测试：
+#firefox http://192.168.4.5/
+#curl http://192.168.4.5/
+
+
+
+常见错误：
+1.后台web没启服务 service httpd start
+2.后台web防火墙   iptables -F
+3.后台web IP地址与nginx设定的IP不同
+4.nginx没有定义转发proxy_pass
+5.nginx没有重启服务
+
++++++++++++++++++++++
+Nginx调度器其他设置
+
+upstream cluster{
+    #ip_hash;    //相同的客户端找相同的服务器
+//Nginx默认算法是轮询(Round Robin)
+    server 172.16.0.100 max_fails=1 fail_timeout=30;
+//定义后端服务器，最大失败次数，失败后，停同多少秒
+        server 172.16.0.200 max_fails=1 fail_timeout=30;
+       #server 172.16.0.201 weight=3;
+//定义权重，权重越大，访问量越多
+      #server  172.16.0.202 down;
+//宕机的服务器
+      #server 172.16.0.203 backup;
+//备用服务器
+}
+
+
+

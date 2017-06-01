@@ -1,0 +1,135 @@
+
+一、网站基础
+B/S是C/S架构的一种特例
+作用：基于HTTP协议提供网页
+协议：TCP 80
+软件包（S）：httpd、httpd-manual
+软件包（B）：firefox、IE、elinks、下载工具（wget、curl）
+
+主配置文件：/etc/httpd/conf/httpd.conf
+配置目录：/etc/httpd/conf.d/*.conf
+访问日志：/var/log/httpd/access_log
+错误日志:/var/log/httpd/error_log
+检查配置：httpd  -t
+网页根目录：/var/www/html 		【DocumentRoot】
+
+常见的配置选项：
+ServerName  完整主机名（FQDN）
+DocumentRoot  网页根目录
+User  运行身份（用户）
+Group  运行身份（组）
+DirectoryIndex  首页文件1  首页文件2 。。。
+
+<Directory  "目录路径">
+     目录授权设置
+     .. ..
+</Directory>
+<VirtualHost  IP地址> 
+    虚拟站点的设置
+    .. ..
+</VirtualHost>
+
+虚拟Web主机：
+基于域名 —— www.a.cn、www.b.cn ==》 1.2.3.4（同一台主机）
+基于IP地址 —— 1.2.3.4、1.2.3.5 ==》同一台主机
+基于端口 —— www.a.cn:81、www.a.cn:82 ==》同一台主机
+
+1. 解决域名解析
+目标：让客户机知道每一个虚拟站点的域名对应的IP地址
+#vim /etc/hosts
+Web服务器的IP地址	站点1的FQDN  站点2的FQDN
+
+2. 准备虚拟站点的网页
+
+3. 配置虚拟主机
+#vim  /etc/httpd/conf.d/vhosts.conf
+NameVirtualHost  网站服务器的IP地址
+<VirtualHost  IP地址>
+    ServerName  IP地址
+    DocumentRoot  /var/www/html
+</VirtualHost>
+<VirtualHost  IP地址>
+    ServerName  站点1的FQDN
+    DocumentRoot  站点1的网页目录
+</VirtualHost>
+<VirtualHost  IP地址>
+    站点2的设置
+    .. ..
+</VirtualHost>
+
+4. 测试
+elinks  -dump  http://服务器地址/
+
+
+http://服务器地址/		  ==》 /var/www/html/index.html
+http://服务器地址/dir1/abc.html  ==》 /var/www/html/dir1/abc.html
+http://IP地址/ 	  ==》/虚拟站点1的网页根目录/index.html
+
+
+二、LAMP平台构建
+Linux、Apache HTTP Server、MySQL、PHP/Perl/Python
+yum  -y  install  httpd  mysql-server  mysql  php  php-mysql
+
+配置MySQL：
+1. 修改数据库管理账号的密码
+# mysqladmin  -u  root  -p  password '密码字串'
+
+2. 访问数据库
+# mysql -u root -p
+
+配置PHP：
+/etc/php.ini
+
+
+三、PHP应用部署
+
+Discuz! X
+
+
+提前准备数据库：
+# mysql -u root -p 
+mysql> create database 数据库名;
+mysql> grant  all on 数据库名.* to  用户名@localhost  identified by '密码字串';
+mysql> quit
+
+忘记MySQL管理密码：
+# rpm -e mysql-server --nodeps
+# rm -rf /var/lib/mysql/
+# yum -y install mysql-server
+# mysqladmin -u root password '新密码'
+
+/etc/hosts文件
+www.google.com	192.168.4.5
+www.baidu.com 	192.168.4.5
+www.qq.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

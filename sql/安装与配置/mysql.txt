@@ -1,0 +1,2529 @@
+庞丽静 （ 静静 ）
+第4阶段课程内容   DAB 数据库管理员
+                             IDC监控
+mysql数据库管理  7
+Linux安全             3
+Linux监控             3
+
+
+ftp://172.40.50.117/soft    软件
+
+ftp://172.40.50.117/nsd1609/mysql/note.t
+
+xt
+ftp://172.40.50.117/nsd1609/security/note
+
+.txt
+
+ftp://172.40.50.117/nsd1609/monitor/not
+
+e.txt
+
+++++++++++++++++++++++++
+mysql数据库管理  7
+零基础入门
+表管理
+用户授权与权限撤销
+数据备份与数据恢复
+mysql主从同步
+mysql读写分离
+mysql集群
+mysql优化
+
+一、零基础入门
+1. 什么是数据库  存储数据库的仓库
+
+2 提供数据库服务的软件有哪些？
+Oracle     DB2     SQL  SERVER    MySQL  
+
+商业软件
+开源软件    不等于  免费   
+是否夸平台    Unix   Linux   Windows
+既开源又跨平台 　MySQL
+
+MySQL发展史？ 
+
+MySQL特点？
+
+
+MariaDB  ( RHEL7 )
+数据迁移  mysql  - > MariaDB
+
+关系型数据库系统
+非关系型数据库系统   Mongodb
+                                  用户名   密码
+
+商品信息
+名       型号   价格   总量
+大衣    M      1800  3
+
+销售信息
+名       型号   价格   个数
+大衣    M      1800   2
+
+
+工作中都哪些公司在使用数据库服务
+游戏网站   购物网站    论坛网站    
+婚恋网站   金融网站
+
+数据库服务器用来储存什么数据?
+登录账户   购买的商品   发的帖子
+
+提供网站服务 apache  Nginx   Tomcat
+
+应用环境   :     LAMP    LNMP
+
+
+搭建数据库服务器（HP   Dell   联想）
+                              CPU  内存   存储
+在IP地址是 x.x.x.x  运行MySQL数据库服务
+软件包的来源？  官网下载   
+                操作系统安装光盘自带的
+ 
+软件包的封包 类型？ .rpm    
+                    源码   .tar.gz  .tar.bz2
+
+装包 (.rpm)
+
+安装操作系统安装光盘自带的mysql软件提供
+
+数据库服务
+rpm  -q  mysql-server    ||  yum -y  install   
+
+mysql-server
+
+service  mysqld   status|start|stop
+
+chkconfig   mysqld   on
+
+客户端的访问(默认只允许本机访问)
+[root@stu yum.repos.d]# which  mysql
+/usr/bin/mysql
+[root@stu yum.repos.d]# rpm -qf  
+
+/usr/bin/mysql
+mysql-5.1.73-5.el6_6.x86_64
+[root@stu yum.repos.d]#
+
+[root@stu ~]# mysql
+mysql>  quit
+[root@stu ~]#
+
+安装官网下载的mysql软件提供数据库服务
+
+
+主配置文件   /etc/my.cnf
+服务名  mysqld 
+进程名  mysqld
+进程所有者/组   mysql/mysql
+端口号    3306
+传输协议  tcp
+数据库目录  /var/lib/mysql/
+
+
+把数据库存储到数据库服务器上的过程？
+1  连接数据库服务器    mysql
+2  选择库    use  库名；
+3  创建表   
+4  向表中插入记录   insert  into
+5 断开连接  quit
+
+数据以文件的形式存储在数据库目录下
+
+数据库服务的基本使用?
+
+SQL命令使用规则:命令不区分字母大小写
+                             \c   终止命令
+                             命令必须以;结尾
+                             命令不支持tab键补齐
+
+库名的命名规则：             具有唯一性
+                             区分字母大小写
+                            只能使用数字、字母  _
+                            不能是纯数字
+                            不要使用特殊字符和关键字
+                             ？  *  .  
+show  databases;   显示已有的库
+create  database  库名；
+use 库名； 切换库
+select  database();  查看当前所在的库
+
+drop  database  库名； 删除已有的库
+
+show  tables;  显示当前所在库下已有的表
+
+创建表（表存放在库里）
+create  table  库名.表名（
+字段名1   类型，
+字段名2   类型，
+字段名3   类型
+）；
+
+create  table  bbsdb.stuinfo(
+name  char(10),
+age  int,
+sex   char(10)
+);
+
+select 字段名列表 from 表名;  查看表记录
+select * from stuinfo;
+
+desc 表名;  查看表结构
+desc stuinfo;
+
+desc  mysql.db;
+select user,host,db  from mysql.db;
+
+向表中插入记录
+insert  into  stuinfo  values("jim",21,"boy");
+
+删除表中的所有记录
+delete  from 表名；
+delete  from  stuinfo;
+
+删除表
+drop   table  表名；
+drop   table   stuinfo; 
+
+建表的语法格式
+
+create  table  表名(
+字段名   类型（宽度）  约束条件，
+字段名   类型（宽度）  约束条件，
+字段名   类型（宽度）  约束条件
+);
+
+mysql数据库类型
+字符类型 (姓名  家庭地址) 
+char      定长  255
+varchar 变长  255+
+                      65532
+大文本类型
+blob
+text
+
+create  table  t1(
+name   char(5),
+address  varchar(20)
+);
+
+insert  into  db10.t1 values
+
+("jerryy","beijing");
+
+insert  into  db10.t1 values
+
+("jerry","beijing");
+t1               t2
+name       name
+char(3)     varchar(3)
+  jim           jim
+  a              a
+  ab            ab
+                  abc
+
+create  table  t5( name   text );
+create  table  t5( name   blob );
+
+数值类型 (工资          成绩   年龄  身高  体重)
+                18000.88   59.9   21
+                                            +21
+		           -21
+整数类型 
+根据存储数值的范围又分为：  
+	   	有符号           无符号
+tinyint  微小整型    -128~127        0~255
+smallint 
+MEDIUMINT  
+int    
+bigint
+
+create  table   t7(level   tinyint);
+create  table   t8(age   tinyint  unsigned);
+
+insert  into t8 values(170);
+
+浮点型      float       double
+                 单精度    双精度
+
+float(n,m)
+double(n,m)
+n  表示总位数
+m 表小数位位数
+整数.小数
+1023.77
+create  table  t9(
+name  char(10),
+age   int,
+pay  float7,2)
+);
+
+insert into  t9 values ("jim",21,118000.23);
+insert into  t9 values ("jim",21,118000);
+
+数值类型的宽度与字符类型宽度的区别？
+数值类型的宽度是显示宽度，不能够控制给字
+
+段赋值的大小，字段值的大小由字段类型决定
+create  table  t10(
+name  char(3),
+id        int(3)               
+);
+insert  into  t10  values("tom",1129);
+insert  into  t10  values("luc",1029);
+
+create  table  t12(
+level    int  zerofill,
+id        int(3)        zerofill         
+);
+
+create  table  t13(
+level    int (1)
+id        int(1)          
+);
+
+日期时间类型 (生日  注册时间  入职时间)
+年      year    YYYY    2016
+                     01-69  20XX
+                     70-99  19XX
+                     00        0000
+
+日期   date    YYYYMMDD  20161219
+时间   time    HHMMSS 144518
+
+日期时间   （ 约会时间 ）
+ datetime / timestamp                     
+
+YYYYMMDDHHMMSS 
+20170214183018
+
+
+datetime 与 timestamp   的区别？
+当不给timestamp类型的字段赋值时，用系统
+
+当前的时间给字段赋值。
+
+create  table  t16(
+time1  timestamp,
+time2  datetime
+);
+
+insert  into  t16   values
+
+(20171219165200,20161219165200);
+
+
+insert  into  t16 (time1)  values
+
+(20191219165200);
+
+insert  into  t16 (time2)  values
+
+(20151219165200);
+
+create  table  t15(
+name  char(10),
+age   tinyint(2) unsigned,
+pay  float(7,2),
+up_class  time,
+birthday   date,
+s_year   year,
+meetting   datetime
+);
+insert into  t15  values
+
+("bob",21,18800.88,083000,20170101,1995
+
+,20161224203000);
+
+insert into  t15(name,s_year)values
+
+("lucy",13);
+
+insert into  t15(name,s_year)values
+
+("alic",70),("lilei",00);
+
+select name,s_year from t15;
+
+使用时间函数获取时间给日期时间类型字段赋
+
+值
+now()  获取当前系统时间
+year()  获取年份
+date() 获取日期
+month()   获取月份
+day()       获取日期（几号）
+time()  获取时间
+
+select  year( now() );
+select  year( 20191224 );
+select  date( now() );
+
+insert into  t15  values
+
+("lili",21,18800.88,now(),now(),now(),now());
+
+insert into  t15  values
+
+("tom",21,18800.88,time(20171224201818),date(20171224201818),year(20171224201818),now());
+枚举类型  （爱好    性别  ）
+字段的值只能在列举的范围内选择
+enum(值列表)  单选
+set(值列表)       多选
+
+create   table  t17(
+name  char(10),
+sex   enum("boy","girl","no"),
+likes  set("woman","game","film","music")
+);
+
+insert  into  t17  values
+
+("bob","boy","woman,game");
+
+ insert  into  t17  values("alic",3,"game");
+
+查看建表过程
+show  create  table  表名；
+
+create table 学生信息表2(
+姓名 char(10),
+年龄 int(2) 
+)DEFAULT  CHARSET=utf8;
+
+insert into 学生信息表2 values  ("张三丰",21);
+
+课后作业：
+创建stuinfo表，设置合理的字段个数和字段类型。
+
+day01内容回顾：
+提供数据库服务的软件有哪些？
+哪些是开源软件 商业软件  是否跨平台？
+mysql的发展史？ 特点 ？ 应用场景 分支版本
+
+安装系统自带的mysql数据软件提供服务？
+rpm   -q  mysql-server    mysql
+
+启动mysql数据库服务
+service  mysqld   start|stop|status
+
+3306   /etc/my.cnf   mysqld  
+mysql/mysql   tcp 
+/var/lib/mysql/
+
+连接数据库服务器
+mysql  -hlocalhost   -uroot   -p123  库名
+
+SQL命令 的使用规则？
+
+管理库相关的命令？
+show  databases;
+use    
+select database();
+show  tables;
+create  database   
+drop  database
+
+管理表相关的命令？
+create  table   表（字段列表）；
+
+select  *  from  表名；
+desc   表名；
+delete  from  表名；
+drop   table  表名；
+insert   into   表名  values(字段值列表)；
+
+mysql数据类型？
+字符类型  char    varchar  text   blob
+数值类型  tinyint   smallint   int  bigint
+                zerofill    unsigned
+                float(n,m)   double(n,m)
+
+日期时间类型   year   data   time
+                        datetime   timestmap
+                       01-69    20xx
+                       70-99    19xx
+                       00          0000
+时间函数  now()   year()   date()  day()
+                month()   time()
+
+
+枚举类型  enum    set
+                单选      多选
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+约束条件  
+作用：当向表中插入新记录时，限制如何给字
+
+段赋值，若建表时不设置约束条件，使用
+
+mysql的默认设置。
+
+Null 是否允许为null （空） 不设置默认允许为空
+
+not   null    不允许为null
+
+create  table   t22(name char(5) not null,id  
+
+int(2) not  null);
+
+insert  into  t21  values(null,null);
+insert  into  t22  values("",19);
+insert  into  t22  values("NULL",19);
+
+Key   是否是索引字段  
+         默认不是索引字段
+
+Default 字段是否有默认值，若没有设置默认
+
+值，默认值是null
+作用：向表中插入新记录时，当不给记录的字
+
+段赋值时，使用字段的默认值给字段赋值，指
+
+定默认值时 要与字段的类型匹配。
+
+字段名 类型（宽度） default  值
+
+create  table  t23(
+name  char(10)  not  null ,
+age   tinyint(2)  unsigned   default  21,
+sex   enum("boy","girl")  default  "boy",
+likes  set("book","music","film","game") default  "film,game"
+);
+
+insert  into   t23(name)values("bob");
+
+insert  into   t23  values("tom",28,"girl","book");
+
+
+Extra  额外设置（例如自增长 描述信息）
+
+修改表结构
+alter   table   表名    执行动作1；
+
+add 添加新字段
+add  字段名   类型(宽度)  约束条件  ；
+add  字段名   类型(宽度)  约束条件  first；
+add  字段名   类型(宽度)  约束条件  after  字段名；
+
+alter  table  t1  add   class  char(7)  default "nsd1609" first,add  tel  char(11) ,add  sex  enum  ("boy","girl")  default  "boy" after  name;
+
+drop  删除字段
+drop  字段名
+alter table   t1  drop  name，drop  sex;
+
+modify 修改字段类型
+* 不能与已经存储的数据冲突
+modify   字段名  类型(宽度) 约束条件；
+
+mysql> alter table   t1
+    -> modify  
+    -> sex  enum("boy","girl","no") not null  default  "no";
+
+change 修改字段名
+change   原字段名    新字段名  类型(宽度) 约
+
+束条件；
+  
+alter table  t1  change  tel  iphone char(11);
+
+修改表名
+alter  table  原表名  rename  [to]  新表名；
+alter table  t1 rename t111;
+
++++++++++++++++++++++++++
+day02
+mysql索引
+mysql存储引擎
+
+一、mysql索引
+什么是索引？  相当于 “书的目录"
+总页数  1000页
+            1~1000
+
+目录   1----30
+第一章   31--217   网站搭建
+               35-40              数据加密  2
+第2章   218--273  dhcp  
+。。。
+第十章
+
+正文
+
+索引的优点   加快查询记录的速度
+索引的缺点   会减慢写的速度
+                               insert
+                               update
+                               delete
+                    占用物理存储空间
+
+在表里建索引 设置在字段上  10
+stuinfo.frm   stuinfo.ibd
+name   class   sex   age
+jim
+tom
+lucy
+jerry
+bob
+alic
+aliccc
+
+select  name  from userinfo where name 
+
+like   "j%"
+
+mysql索引类型
+普通索引 index    *
+唯一索引 unique
+主键        primary key   *
+外键        foreign  key   *
+全文索引  fulltext
+使用索引（查看  创建  使用规则  删除  ）
+查看索引
+desc   表名；  Key
+
+show  index  from  表名\G；
+Table: user
+Column_name: Host
+Key_name: PRIMARY
+Index_type: BTREE    B+tree   hash
+                    二叉树    
+
+               1-100
+       1-5              6-10
+1-2.5  2.6-5
+++++++++++++++++++++++
+普通索引的使用规则？
+一个表中可以有多个INDEX字段
+字段的值允许有重复，且可以赋NULL值
+经常把做查询条件的字段设置为INDEX字段
+INDEX字段的KEY标志是MUL
+
+创建普通索引
+1  在已有表里创建index字段
+create index  索引名  on  表名(字段名);
+create index  sex  on  t111(sex);
+
+2  建表时创建index字段
+create  table  表名 （
+字段名列表，
+index(字段名)，index(字段名)
+）;
+create  table  t24(
+name  char(10) ,
+age   tinyint(2)  unsigned   default  21,
+sex   enum("boy","girl")  default  "boy",
+likes  set("book","music","film","game") default  "film,game"，
+index(name),
+index(sex)
+);
+
+insert into  t24(name)values("bob"),("bob"),(null),(null);
+
+删除普通索引
+drop index  索引名  on  表名；
+drop  index  sex   on   t24;
+
+唯一索引 unique
+字段的值可以为Null  但不可以重复
+一个表里可以有多个unique字段
+标志 UNI
+身份证    考试证    护照   驾驶证
+
+建表时创建
+create  table  t29(
+name  char(10),
+stu_id  char(9),
+age int(2),
+unique(stu_id)
+);
+mysql> insert   into  t29   values 
+
+("lucy","nsd160903",18);
+Query OK, 1 row affected (0.05 sec)
+
+mysql> insert   into  t29   values 
+
+("lucy","nsd160901",18);
+
+mysql> insert   into  t29   values 
+
+("lucy","nsd160903",18);
+
+mysql> insert   into  t29   values 
+
+("lucy",null,18);
+
+drop index  索引名  on  表名;
+drop index  stu_id  on  t29;
+
+在已有表里创建unique字段
+create   unique  index  索引名   on  表名（
+
+字段名）
+
+create  unique  index  stu_id  on  t29
+
+(stu_id);
+++++++++++++++++
+缴费表
+学号            姓名  金额
+nsd16091   jim   20000
+nsd16098   jim   20000
+null             bob  18000
+nsd16097   alic   20000
+班级表
+学号                    姓名
+nsd16091   jim   
+nsd16098   jim   
+
+
+
+外键        foreign  key   *
+功能 让当前表某个字段的值，在另一个表某个
+
+字段值的范围内选择。
+
+使用规则？
+1 表的存储引擎必须是innodb
+2 字段的数据类型要匹配
+3 被参考的字段必须是key 中的一种 (primary key)
+ 
+
+create  table  jfb(
+jfb_id   int(2) primary key auto_increment,
+name  char(10),
+pay   float(7,2)
+)engine=innodb;
+
+insert  into  jfb(name,pay)values("bob",18000),("lucy",17800),("alic",20000);
+
+create table  bjb(
+bjb_id  int(2),
+name  char(10),
+foreign  key(bjb_id)  references   jfb(jfb_id) on  update  cascade   on  delete cascade
+)engine=innodb;
+
+mysql> show  create table  bjb;
+
+select  * from bjb;
+
+insert into   bjb   values(2,"lucy");
+
+insert  into jfb(name,pay)values("lilei",18000);
+
+insert into   bjb   values(5,"lilei");
+
+delete  from jfb  where jfb_id=3;
+
+update  jfb  set   jfb_id=8 where jfb_id=2;
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+使用外键的注意事项：
+delete  from  jfb;
+drop  table  jfb;
+alter  table  jfb  drop  jfb_id;
+
+删除外键
+alter table  表名 drop  foreign key  外键名
+
+；
+
+show create   table   表名；
+
+alter table bjb drop foreign key  
+
+bjb_ibfk_1;
+
+
+二、mysql存储引擎
+什么是存储引擎？
+表的处理器，是mysql数据库服务软件自动程
+
+序，不同处理器有不同的功能和数据存储方式
+
+。
+查看数据库服务支持哪些存储引擎
+show  engines;
+ InnoDB           DEFAULT
+
+修改mysql数据库服务默认使用的存储引擎？
+
+vim  /etc/my.cnf
+[mysqld]
+default-storage-engine=myisam
+:wq
+service  mysql  stop
+service  mysql  start
+
+建表时指定表使用的存储引擎
+create  table  t31(name char(10))
+
+engine=memory;
+
+修改表使用的存储引擎
+alter  table  表名  engine=存储引擎名；
+
+alter  table  t31  engine=innodb;
+
+查看表使用的存储引擎？
+show  create  table  表名；
+
+工作中使用哪种存储引擎？
+myisam
+innodb
+
+
+sam的特点?
+支持表级锁
+不支持外键 、 事务 、事务回滚
+
+独享表空间
+t1.frm  表结构  
+t1.MYD  表记录  
+t1.MYI   表索引
+
+
+innodb的特点?
+支持行级锁
+
+支持外键 、 事务 、事务回滚
+ 
+共享表空间
+t3.frm    表结构 
+t3.ibd   表记录+表索引
+
+事务？  一次sql操作从开始到结束的过程。
+
+事务回滚？执行一次事务，只要执行过程中，
+
+任何一步执行失败，就恢复之前所有的sql操作
+
+。
+
+ATM
+A     ------------>  B	
+
+A  登录    密码
+
+转账       金额        10000
+              对方卡号  xxxxxx
+              确定
+                       转账中......      A-1W  B+1W
+                                      余额不足
+                       转账成功
+退卡
+
+事务日志文件记录对所有inondb存储引擎的表
+
+执行过的sql命令。
+ibdata1  记录sql命令产生的数据信息
+
+ib_logfile0
+                   记录SQL 命令
+ib_logfile1
+
+insert  into  t1   values(101),(202),(999);
+
+ti.idb  真实的数据
+select   * from t1
+id
+101
+202
+999
+
+锁机制是为了解决客户端的并发访问冲突问题
+
+。
+
+
+锁粒度： 表级锁   行级锁    页级锁
+
+锁类型：
+读锁 （共享锁）  select  * from t1;
+写锁  (互斥锁  排它锁)                           
+          insert  into  t1  values(22);
+          update  t1 set  id=102  where id=22;
+          delete from  t1 where id=99;
+
+建表时如何决定表使用的存储引擎？
+执行写操作多的表适合使用inondb存储引擎，
+
+这样并发访问大。
+
+执行读操作多的表适合使用myisam存储引擎
+
+
+mysql体系结构（mysql服务的工作过程）
+连接池
+sql接口
+分析器
+优化器
+查询缓存
+存储引擎
+文件系统
+管理工具
+++++++++++++++++++++++++
+day02内容回顾：
+1约束条件:
+是否允许为空   not  null
+是否是索引
+默认值   default  值
+额外设置
+
+2修改表结构：
+alter  table  表名  执行动作；
+add         after   first
+modify  
+drop
+change 
+
+3mysql 索引
+什么是索引？
+优点与缺点？
+
+mysql索引类型
+index   primary  key    unique   foreign key
+索引的查看 创建  删除  使用规则
+
+4 mysql存储引擎
+修改mysql数据库服务默认使用的存储引擎
+vim  /etc/my.cnf
+[mysqld]
+default-storage-engine=存储引擎名
+:wq
+service  mysql  restart
+
+查看存储引擎：
+show  engines;
+
+show  create  table  表名；
+
+create table 表名（字段列表）engine=存储
+
+引擎名；
+
+alter  table   表名  engine=存储引擎名；
+
++++++++++++++++++++++++
+day03
+数据导入  ： 把系统文件的内容存储到数据库
+
+的表里。
+
+把系统用户信息存储到数据库服务器userdb库
+
+下的student表里。
+cat  /etc/passwd
+用户名 密码  uid  gid   描述信息 家目录 shell
+
+create  database  userdb;
+create  table  userdb.student(
+name   char(25),
+password  char(1),
+uid   smallint(2), 
+gid  smallint(2),
+comment  varchar(50),
+homedir   char(30),
+shell  char(30),
+index(name)
+);
+
+mysql> LOAD   DATA  INFILE  '文件名' 
+INTO TABLE  表名
+FIELDS TERMINATED BY  '分隔符'
+LINES TERMINATED BY  '\n';
+
+load   data   infile  "/etc/passwd"  into  
+
+table   userdb.student  fields  terminated 
+
+by ":"  lines  terminated by "\n";
+
+alter  table  userdb.student  add  id  int(2) 
+
+zerofill  primary  key   auto_increment first;
+
+数据导出: 把表中的记录存储到系统文件里。
+sql查询命令  INTO  OUTFILE  '文件名'；
+
+sql查询命令  INTO  OUTFILE  '目录名/文件名
+
+'；
+
+sql查询命令  INTO  OUTFILE  '目录名/文件名
+
+'   fields  terminated   by "符号"；
+
+sql查询命令  INTO  OUTFILE  '目录名/文件名
+
+'   lines  terminated   by  "!!!"；
+
+sql查询命令  INTO  OUTFILE  '目录名/文件名
+
+'  fields  terminated   by "符号"    lines  
+
+terminated   by  "符号"；
+
+select * from student into outfile  "plj.txt";
+
+select * from userdb.student into outfile  
+
+"/tmp/plj8.txt";
+
+
+select * from userdb.student into outfile  
+
+"/mydata/plj8.txt";
+
+select name,uid,shell from userdb.student 
+
+into outfile  "/mydata/plj1.txt";
+
+select name,uid,shell from userdb.student 
+
+limit 4;
+
+select name,uid,shell from userdb.student 
+
+limit 4 into outfile  "/mydata/plj3.txt"  
+
+fields terminated by "##";
+
+select name,uid,shell from userdb.student 
+
+limit 4 into outfile  "/mydata/plj7.txt"  
+
+lines terminated by "!!!";
+
+管理表记录
+插入新记录 insert   into
+一次插入一条记录 给记录的所有字段赋值
+insert  into   库.表   values(值列表);
+
+一次插入多条记录 给记录的所有字段赋值
+insert  into   库.表   values(值列表),(值列表);
+
+一次插入1条记录 给记录的指定字段赋值
+insert  into   库.表(字段名列表)   values(值列
+
+表);
+
+一次插入多条记录 给记录的指定字段赋值
+insert  into   库.表(字段名列表)   values(值列
+
+表)，(值列表);
+insert  into  userdb.student   values
+
+(26,"bob","x",2077,2077,"this is 
+
+student","/home/bob","/sbin/nologin");
+
+insert  into  userdb.student   values
+
+(27,"bob","x",2077,2077,"this is 
+
+student","/home/bob","/sbin/nologin"),
+
+(28,"bob","x",2077,2077,"this is 
+
+student","/home/bob","/sbin/nologin");
+
+insert  into  userdb.student(name,uid,gid)   values("alic",300,301);
+
+insert  into  userdb.student(name,uid,gid)   values("alic",300,301),("lucy",309,401);
+
+++++++++++++++++++++++++
+查询表记录　select
+select  字段列表   from  表名  where  表达式
+
+；
+
+select   *  from  student;
+select  id,name,homedir  from  student;
+
+select  字段列表   from  表名  where  条件表
+
+达式；
+
+select   *  from  student  where  id=3;
+
+select  id,name,homedir  from  student  where  id=3;
+
+条件的表示方式？
+1  数值比较
+字段名   符号   数字
+=    !=    >    >=   <   <=
+
+select  name,shell  from student where uid=500;
+
+select  *  from student where uid=500;
+
+2 字符比较
+字段名   符号   "值"
+=    !=
+
+select  name from student  where name="zhangsan";
+
+select  * from student  where name!="root";
+
+3 范围内比较
+between ... and ...   在...之间
+in  (值列表)              在....里
+not   in  (值列表)              不在....里
+
+select  name,uid,homedir,shell  from student where  uid   between 10 and  20;
+
+select name  from student where  name  in ("root","daemon","rsync");
+
+select name,uid  from student where  uid  in  (2000,100,105,13);
+
+
+select id,name,uid  from student where  id  not  in  (1,10,20);
+
+4   匹配空     is  null
+     匹配非空  is  not  null
+
+insert  into   student(id,name)values(30,""),(31,null),(32,"null"),(33,NULL);
+
+select  id,name  from  student  where  name is  null;
+
+select  id,name  from  student  where  name="null";
+
+select  id,name  from  student  where  name="";
+
+select  id,name  from  student  where  name is not  null;
+
+select  id,name  from  student  where  shell  is  null;
+
+逻辑比较（多个查询条件）
+逻辑与   and  多个查询条件必须同时成立
+逻辑或   or    多个查询条件某个条件成立就可以
+逻辑非   ！   取反
+
+select id,uid,name,homedir,shell  from student where name="root"   or  uid=1  or  shell="/bin/bash";
+
+select id,uid,name,homedir,shell from student where name=="root"  or  uid=1  or  shell="/bin/bash";
+
+select   name,uid  from student where  name="root"  or  name="bin"  and  uid=0 
+
+select   name,uid  from student where  name="root"  or  name="bin"  and  uid=1 ;
+
+select   name,uid  from student where  (name="root"  or  name="bin" ) and  uid=1 ;
+
+
+6   四则运算  +  -   *   /    %
+alter   table   student  add   age   tinyint(2) default  21  after  name;
+
+alter   table   student  add   linuxsys  int(2)  default  60  after  age, add   linuxser  int(2)  default  60  after linuxsys;
+
+select name,2016-age as s_year , age from student;
+
+select name,year(now())-age as s_year , age from student;
+
+
+select  name,linuxsys,linuxser,(linuxsys+linuxser)/2  as  pjf  from  student where name="root";
+
+
+7  模糊查询 like
+字段名  like   '表达式'
+_  任意一个字符
+ 
+%  零个或多个字符
+
+select name from student where name like '___';
+
+insert into student(name)values("a");
+
+select name from student where name like 'a%';
+
+select name from student where name like '_a_';
+
+select name from student where name like '%a%';
+
+select  id,name from student where name like '%';
+
+8  在查询结果里顾虑数据  having  条件
+
+select  id,name from student where name like '%'  having  id  in (33,31);
+
+
+9  使用正则表达式做查询条件
+^   $    .   *   [ ]
+
+字段名   regexp   '正则表达式'
+insert  into  student(name)values("plj9"),("pl8j"),("p7lj"),("6plj"),("1plj");
+
+select name,uid from student where name regexp '^a.*t$';
+
+select name,uid from student where uid  regexp '^..$';
+
+select name,uid from student where uid  regexp '..';
+
+10   聚集函数
+max(字段名)  获取最大值
+min(字段名)  获取最小值
+avg(字段名)  获取平均值
+sum(字段名)  求和
+count(字段名)  获取字段值个数
+
+select avg(linuxsys) from student;
+
+select sum(linuxsys) from student;
+
+select max(gid) from student;
+
+select count(name),count(id) from student;
+
+select count(*) from student;
+
+11  查询分组  group  by   字段名
+sql查询命令    group  by   字段名;
+
+select  shell   from  student where  uid<500;
+
+select  部门  from 员工信息表 where  性别="女" and  年龄<=25  and  工资>=10000  group by   部门；
+
+
+12 查询排序  order  by
+sql查询命令  order  by  字段名   排序方式
+                                                  asc   升序
+                                                  desc 降序
+
+select uid  from  student  where uid <500  order  by   uid;
+
+select uid  from  student  where uid <500 and shell!="/bin/bash"  order by  uid desc
+
+13 limit  限制显示查询结果记录的行数。
+limit   数字；
+limit   起始行，共显示几行
+
+
+select  name,uid from student  order by  uid;
+
+select  name,uid from student  order by  uid desc limit  5;
+
+select  name,uid from student  order by  uid desc limit  5，10;
+
+
+select * from student  limit 1;
+
+select * from student  limit 2,5;
+
+14  DISTINCT  不显示重复的值
+select    distinct  shell   from  student;
+select shell   from  student group by shell;
+
+15  where  子查询
+把内层查询结果做为外层的查询条件。
+insert into  student(name,linuxsys)values("lili",38),("jerry",58),("lucy",59);
+
+select  字段名列表 from  表A   条件 （select  字段名列表 from  表B）；
+
+select name,linuxsys  from student where  linuxsys  < (select  avg(linuxsys) from student);
+
+select id,name from   student  where  name in  (select userser from mysql.user where host="::1");
++++++++++++++++++++++
+16  复制表（备份表  快速创建新表）
+create  table  新表名   sql查询命令；
+复制全表
+create  table  新表名  select  *  from 表名；  
+create  table  stu4   select  * from student;
+复制部分数据
+create  table  新表名  select  字段名列表  
+
+from 表名  where 条件；
+create  table  stu3   select name,homedir,shell  from student  where uid<=10 ;
+只复制表结构
+create  table  新表名  select  *  from 表名 where    1 =  2；
+create  table  stu2   select  * from  student  where  1 = 2;
++++++++++++++++++++++++
+17 更新表记录update (修改记录字段的值)
+批量修改
+update  表名  set   字段名=值，字段名="值";
+update  student set  age=18;
+
+
+修改复合条件的记录字段的值
+update  表名  set   字段名=值，字段名="值" where  条件;
+
+select id,name from student  where name is  null;
+
+update  student set  name="zhangsan" where id=31;
+
+18 删除表记录 delete
+删除表的所有记录。
+delete  from  表名； 
+
+只删除符合条件的记录
+delete  from  表名  where  条件； 
+delete  from  student where  name is  null;
+delete  from student where name="bob";
+
++++++++++++++++++++++++++
+day03课程内容回顾：
+数据导入
+1  什么是数据导入
+2  导入命令的语法格式
+3  导入数据注意事项
+
+数据导出
+1  什么是数据导出
+2  导出命令的语法格式
+3  导出数据注意事项
+
+管理表记录：
+插入记录  insert   into 
+查询记录  select 
+查询条件： 数值比较   字符比较 
+                  范围内查找
+                  匹配空   匹配非空
+                  逻辑比较  
+                  四则运算
+                  模糊查询 like   _   %
+                  正则匹配   regexp    ^ $  .  *  [ ]
+                  聚集函数  max()  min() avg() 
+                                  sum()  count() 
+
+                  查询排序  
+                  order  by  字段名  desc/asc
+                  
+                  查询分组
+                  group  by     字段名;
+
+                  限制显示记录数
+                  limit  数字
+
+                  limit   数字1，数字2  
+
+                  在查询结果里过滤数据
+                  having   条件
+                  
+where嵌套查询
+sql查询     where  字段   符号 （sql查询）；
+
+更新记录字段值
+update   表名   set  字段名=值，字段名="值"
+
+；
+
+update   表名   set  字段名=值，字段名
+
+="值"where   条件；
+
+update  student  set  name=""  where  
+
+name="jim";
+
+update  student  set  shell=null  where  
+
+name="root";
+
+删除表记录
+delete   from  表名；
+delete   from  表名 where 条件；
+
+复制表（快速创建新表   备份表）
+*不会把原表的字段的索引属性复制给新表。
+
+create   table   新表名  sql查询 ；
+ 
+
+day04
+19 多表查询
+                                         笛卡尔集
+select  字段名列表  from  表名列表；
+                                         2x4=8
+
+select  字段名列表  from  表名列表 where 条
+
+件；
+
+create  table t41 select name,uid  from  
+
+student limit 2;
+
+create table t42 select name,uid,shell  
+
+from  student limit  4;
+
+select  *  from t41,t42 where t41.uid  =  
+
+t42.uid;
+
+select t41.name,t42.*  from t41,t42 where 
+
+t41.uid  =  t42.uid;
+
+select t41.name,t42.name  from t41,t42 
+
+where t41.uid  =  t42.uid;
+
+连接查询
+左连接查询（查询时以左边的表为主显示查询
+
+记录）
+
+select  字段名列表 from  表1 left join  表2
+on  条件；
+
+
+右连接查询（查询时以右边的表为主显示查询
+
+记录）
+select  字段名列表 from  表1 right join  表2
+on  条件；
+
+create table t43 select name,uid,shell from 
+
+student limit 3;
+
+create table t44 select name,uid,shell from 
+
+student limit 5;
+
+select  *   from t43 left join t44 on t43.uid 
+
+= t44.uid;
+
+select count( *) from t43 left join t44 on 
+
+t43.uid = t44.uid;
+
+select t43.name from t43 left join t44 on 
+
+t43.uid = t44.uid;
+
+select t43.* from t43 left join t44 on 
+
+t43.uid = t44.uid;
+
+select   *  from   t43  right   join  t44  on 
+
+t43.uid = t44.uid;
+
+恢复数据库管理员从数据库服务器本机登录的
+
+密码。
+service  mysql stop
+service  mysql start  --skip-grant-table
+mysql
+mysql> update mysql.user
+    -> set
+    -> password=password("654321")
+    -> where
+    -> host="localhost" and user="root";
+mysql> flush  privileges;
+mysql> quit;
+service  mysql stop
+service  mysql start
+
+mysql  -uroot  -p654321
+mysql>
+
+修改数据库管理从本机登录的密码
+[root@stu db100]# mysqladmin  -
+
+hlocalhost -uroot -p  password "新密码"
+Enter password: 旧密码
+
+用户授权及撤销
+用户授权的作用：在数据库服务器上新添加一个连接连接数据库服务器的用户，并设置这个用连接到数据库服务器后的访问权限。
+
+给谁授权？  使用者（网站服务器）
+                   管理者（DAB）
+
+* 默认只有数据库管理员root用户从服务器本机登录才有授权权限。
+
+授权的语法
+mysql  -hlocalhost -uroot  -p999
+mysql>  grant  权限列表  on  数据库名  to  用户名@"客户端地址"  identified by "密码"  with  grant option;
+
+mysql> grant  权限列表  on  数据库名  to  用户名
+
+权限列表:
+all    所有权限
+select,update(name,age)  指定权限
+usage  无权限 
+
+数据库名：
+*.*  所有库和所有表
+库名.*   一个库的权限
+库名.表名 一张表的权限
+
+用户名： 客户端连接数据库服务器时，使用的登陆名，授权时自定义即可，要有标识性。
+
+客户端地址： 可选项
+%  所有地址
+172.40.50.117  一个IP地址
+192.168.1.%   一个网段
+
+pc100.tedu.cn  主机名
+%.tedu.cn         域名
+
+
+identified by "密码"    设置授权用户连接时使用的密码 可选项
+with  grant option    设置授权用户连接后，有授权权限  可选项
+
+select  user();  显示登陆的用户名和客户端地址；
+
+show grants;  登陆数据库服务器的用户查看自己的访问权限
+
+例子
+允许数据库管理员账号可以从117主机连接自己，连接后对所有库、表拥有完全权限，且有授权权限，连接的密码是plj123
+grant  all  on  *.*  to   root@"172.40.50.117"  identified   by "plj123"  with  grant option;
+
+117:
+mysql -h172.40.50.171  -uroot  -pplj123
+mysql>grant  all  on  bbsdb.*  to  student@"%"   identified  by "123";
+
+mysql>grant select,insert on  userdb.student to studen2;
+
+mysql>grant select,update(name,uid) on  userdb.student to student3;
+
+让jim用户可以在数据库本机登录数据库服务对库表有完全权限 登陆密码是123456
+
+grant  all  on  *.*  to  jim@"localhost" identified by "123456";
+
+默认的4个数据库：
+information_schema  虚拟库
+
+performance_schema  服务运行时的参数信息
+
+mysql   授权库 
+
+test  公共库  只要用户能够连接到服务上对此库就有完全权限
+
+授权信息存储在mysql库里
+user  授权用户的访问权限
+db    授权用户对库的访问权限 
+tables_priv  授权用户对表的访问权限
+columns_priv   授权用户对字段的访问权限
+
+查看已有的授权用户和连接的客户端地址：
+select  user,host from mysql.user;
+
+查看已有授权用户的访问权限：
+show  grants  for   用户@"客户端地址";
+mysql> show grants for  student@"%";
+
+
+撤销用户的权限：
+revoke  权限列表  on  库名   from  用户@"客户端地址";
+
+revoke  grant  option on  *.*  from 'root'@'172.40.50.117';
+
+revoke  drop,delete on  *.*  from 'root'@'172.40.50.117';
+
+
+revoke  all on *.*  from 'root'@'172.40.50.117';
+
+delete from mysql.user where  host="172.40.50.117" and user="root";
+
+flush privileges;
+
+授权用登录数据库服务器后修改自己的登陆密码
+SET PASSWORD=PASSWORD('新密码');
+
+数据库管理员修改授权用户的登录密码
+SET PASSWORD FOR  用户名@'客户端地址'=PASSWORD('新密码');
+
+grant练习题.txt
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+MySQL图形管理工具-phpMyAdmin
+yum  -y  install  httpd   php  php-mysql
+service  httpd  start 
+chkconfig  httpd  on
+tar -zxvf phpMyAdmin-2.11.11-all-languages.tar.gz
+
+mv phpMyAdmin-2.11.11-all-languages /var/www/html/phpmyadmin
+
+cd /var/www/html/
+chown -R apache:apache phpmyadmin/
+
+修改配置
+cd /var/www/html/phpmyadmin/
+cp  config.sample.inc.php   config.inc.php
+
+vim  config.inc.php
+17 $cfg['blowfish_secret'] = 'plj123';
+31 $cfg['Servers'][$i]['host'] = 'localhost';
+:wq
+
+mysql -uroot  -p999
+mysql>  create  database bbsdb;
+mysql> grant  all on  bbsdb.*  to  webadmin@"localhost"  identified by "123";
+
+
+客户端访问
+http://172.40.50.171/phpmyadmin
+                  webadmin
+                  123
+
+day04课程内容回顾：
+多表查询:  
+select  字段名列表 from 表名列表  where 条件；
+
+select  字段名列表 from 表名  left  join  表名 on  条件
+
+select  字段名列表 from 表名  right  join  表名 on  条件
+
+恢复数据库管理员本机登录密码。
+修改数据库管理员本机登录密码。
+
+用户授权:
+为什么要做授权?
+给谁授权？ 
+默认谁授权权限？
+授权命令的语法格式？
+grant   权限列表 on  数据库名　to  用户名；
+grant   权限列表 on  数据库名　to  用户名@"客户端地址"  identified by  "密码"   with  grant  option ；
+
+权限撤销:
+* 对目标库有过授权才可以撤销
+* 撤销的只是权限
+revoke  权限列表 on  数据库名  from  用户名@"客户端地址";
+
+show  grants ;
+select user,host  from mysql.user;
+show  grants    for  用户名@"客户端地址";
+
+授权信息存储在mysql数据库里，使用不同的表存储不同授权信息。
+user    db    tables_priv   columon_priv
+
+安装phpmyadmin图形管理工具
+yum  -y  install   httpd   php  php-mysql 
+
+day05
+数据备份与恢复
+实时增量备份
+XtraBackup 备份
+mysql主从同步
++++++++++++++++++
+数据备份与恢复
+为什么要对数据做备份？数据库丢失时能够使
+
+用备份文件恢复数据。
+
+备份方式：
+物理备份：直接拷贝库或表对应的文件。
+cp   -r   /var/lib/mysql/mysql   /bakdir/
+
+cp  /var/lib/mysql/mysql/user.*  /bakdir/
+
+tar  -zcvf    /bakdir/mysql.tar.gz   /var/lib/mysql/mysql/*
+
+mysqlhostcopy 物理备份命令   
+只适用于MyISAM引擎的表
+yum  -y  install perl-DBD-MySQL  
+
+mysqlhotcopy  -u 用户名 -p 密码   库名   备份位置
+
+mkdir  /mydata
+mysqlhotcopy  -u root  -p 999  userdb  /mydata
+
+使用物理备份文件恢复数据
+cp  -r   备份文件或文件夹   对应的数据库目录下
+chown  -R    mysql:mysql   /var/lib/mysql/目录名或文件
+
+备份策略：
+完全备份     备份所有数据
+                   一台数据库服务器上的所有数据
+                   一个库的所有数据
+                   一张表的所有数据
+
+差异备份    备份自完全备份后所有新产生的数据
+
+增量备份   备份自上一次备份后所有新产生的数据
+                            增量备份
+                            差异备份
+                            完全备份
+
+完全备份+差异备份
+完全备份+增量备份
+
+                  备份时间    库    文件名     储存
+1     完全     18:00        1        1.sql     1
+2     差异                      3        2.sql     3
+3                                  5        3.sql     8
+4                                  2         4.sql    10
+5                                   7        5.sql    17
+6                                  4          6.sql    21
+7    差异                       6           7.sql   27
+
+                  备份时间    库    文件名     储存
+1     完全     18:00        1        1.sql     1
+2     增量                      3        2.sql     3
+3                                  5        3.sql     5
+4                                  2         4.sql    2
+5                                   7        5.sql    7
+6                                  4          6.sql   4 
+7    增量                       6       7.sql   6
+
+
+计划任务    备份脚本
+00  18  *   *   1      /root/allbakdb.sh
+00  19  *   *  2-7    /root/newbakdb.sh
+
+
+完全备份数据命令:
+mysqldump   -uroot    -p999   数据库名 >  目录/名.sql
+
+数据库名的表示方式？
+--all-databases  一台数据库服务器上的所有数据
+数据库名                   一个库的所有数据
+库名  表名                 一张表的所有数据
+
+
+mysqldump -uroot -p999 bbsdb_copy a   > userdb-a.sql
+
+完全恢复数据命令
+mysql  -uroot  -p999   库名  <   名.sql
+
+mysql  -uroot  -p999 bbsdb_copy  < userdb-a.sql
+
+crontab  -e
+00   23    *    *    1    /root/allbakdb.sh   &> /dev/null
+:wq
+
+vim /root/allbakdb.sh
+#!/bin/bash
+day=`date  +%F`
+
+if  [  !  -e   /bakdbdir  ];then
+     mkdir  /bakdbdir 
+fi
+ 
+mysqldump -uroot -p999  userdb   > /bakdbdir/${day}-userdb.sql
+:wq
+
+chmod  +x  /root/allbakdb.sh
+
+/root/allbakdb.sh
+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+实时增量备份
+(启用mysql服务的binlog日志实现对数据的增量备份)
+
+（二进制日志）
+binlog日志？  是mysql服务日志中的一种。记录客户端连接数据库服务器后，执行的除查询之外的sql命令。
+
+查询的命令 ：  select    desc    show 
+
+不是查询的sql命令如下：
+create
+use
+insert  into  
+delete
+drop
+
+启用binlog日志？ (日志编号范围1-999999)
+vim /etc/my.cnf
+[mysqld]
+#log-bin
+log-bin=/mylog/plj
+:wq
+mkdir   /mylog
+chown  mysql:mysql  /mylog
+service  mysql  restart
+
+stu-bin.000001     binlog日>500M 
+stu-bin.000002
+
+stu-bin.index        日志索引文件
+
+查看binlog日志文件内容？
+mysqlbinlog    stu-bin.000001
+
+手动生成新的binlog日志文件?
+mysql>  flush    logs;
+mysql  -uroot -p999  -e  "flush  logs"
+mysqldump  -uroot -p999   --flush-logs  库名    >  xxx.sql
+service  mysql  restart
+
+删除已有的binlog日志文件？
+mysql> PURGE MASTER LOGS TO  "binlog文件";
+purge  master logs  to  "plj.000003";
+
+mysql>reset   master;
+
+binlog日志文件记录sql命令的方法？
+字符偏移量
+sql命令执行时间
+
+使用binlog日志恢复数据？
+mysqlbinlog  选项  binlog日志名  |  mysql  -uroot   -p999  [数据库名]
+
+选项
+--start-position=pos值
+--stop-position=pos值
+
+--start-datetime="yyyy-mm-dd  hh:mm:ss"
+
+--stop-datetime="yyyy-mm-dd  hh:mm:ss"
+
+mysqlbinlog  --start-position=964   --stop-position=1144  plj.000002   |  mysql  -uroot  -p999   
+
+课后作业 binlog日志练习题
+
+完全备份+增量备份
+00    23    *   *    1    /root/allbakdb.sh
+30    23    *   *   2-7   /root/newbakbinlog.sh
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+安装第三方软件XtraBackup对数据做增量备份
+
+XtraBackup介绍：
+在线热备份工具，备份过程中不锁库表，
+只备份表记录，不备份表结构
+表的存储引擎必须是InnoDB/XtraDB
+必须先有一次完全备份，这样再执行备份时才知道那些数据是新产生。
+
+安装XtraBackup：
+rpm -q perl-Time-HiRes
+rpm -ivh percona-xtrabackup-2.1.6-702.rhel6.x86_64.rpm
+
+提供2个备份命令：
+xtrabackup：C程序，支持InnoDB/XtraDB
+
+innobackupex：以Perl脚本封装xtrabackup，还支持MyISAM
+
+xtrabackup_56   命令语法格式：
+（完全备份  完全恢复 增量备份  增量恢复）
+
+xtrabackup_56    <选项>
+
+--backup     备份数据
+--prepare    恢复数据
+
+--target-dir=目录名             指定备份文件存储的目录
+
+--datadir=/var/lib/mysql    指定数据库目录的位置
+
+--incremental-basedir=目录名  增量备份时，指定上一次备份文件存储的目录
+
+--incremental-dir=目录名    增量恢复数据时，指定使用恢复文件所在的目录
+
+
+bbsdb.a    6 -> 101   完全备份
+xtrabackup_56    --backup   --datadir=/var/lib/mysql    --target-dir=/allbak
+
+10 -> 301  第1次增量备份
+xtrabackup_56    --backup    --datadir=/var/lib/mysql  --target-dir=/new1    --incremental-basedir=/allbak
+
+8 -> 801  第2次增量备份
+xtrabackup_56    --backup    --datadir=/var/lib/mysql    --target-dir=/new2   --incremental-basedir=/new1
+         
+3 -> 777 第3次增量备份
+xtrabackup_56    --backup    --datadir=/var/lib/mysql    --target-dir=/new3   --incremental-basedir=/new2
+
+
+xtrabackup 备份数据时，时如何解决如下问题的：
+执行备份时，如何知道，是否有新记录插入？
+在备份数据时如何知道在所有记录里，那些记录是新产生的？
+
+备份数据分为2部分
+1  日志信息
+2  数据
+
+/var/lib/mysql/
+事务日志文件   ib_logfile1
+               ib_logfile2
+
+日志信息文件   ibdata1
+
+LSN   日志序列号 
+
+工作过程：   
+备份目录   /allbak    /new1   /new2  /new3
+xtrabackup_checkpoints   
+xtrabackup_logfile
+ibdata1.*
+库名/表名.ibd.*
+a.ibd
+
+
+
+delete  from  bbsdb.a;
+
+xtrabackup恢复数据的步骤：
+1 准备恢复数据
+xtrabackup_56   --prepare  --datadir=/var/lib/mysql    --target-dir=/allbak
+
+xtrabackup_56   --prepare  --datadir=/var/lib/mysql    --target-dir=/allbak    --incremental-dir=/new1
+
+
+xtrabackup_56   --prepare  --datadir=/var/lib/mysql    --target-dir=/allbak    --incremental-dir=/new2
+
+xtrabackup_56   --prepare  --datadir=/var/lib/mysql    --target-dir=/allbak    --incremental-dir=/new3
+
+2 把备份文件拷贝回对应的数据库目录下
+[root@stu ~]# cp /allbak/bbsdb/a.ibd /var/lib/mysql/bbsdb/
+cp：是否覆盖"/var/lib/mysql/bbsdb/a.ibd"？ y
+[root@stu ~]#
+
+3 重启数据库服务
+service  mysql  restart
+
+4 查看恢复是否成功
+select * from bbsdb.a;
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+把数据库服务器107配置为 171的从数据库服
+
+务器。
+
+1 在107主机上运行mysql数据库服务器。
+rpm  -Uvh  Mysql-*.rpm
+service  mysql  start  ; chkconfig  mysql  on
+cat /root/.mysql_secret
+mysql  -uroot  -pXXXXX
+mysql> set  password for  
+
+root@"localhost"=password("999");
+mysql>quit
+mysql  -uroot  -p999
+mysql> show databases;
+mysql>quit
+
+ping   172.40.50.171
+setenforce  0
+service  iptables  stop
+
+
+171 的配置
+mysqldump    -uroot  -p123   bbsdb   >  /root/bbsdb.sql
+
+scp   /root/bbsdb.sql  root@172.40.50.107:/root/
+
+
+107:
+mysql  -uroot   -p999
+mysql> create  database  bbsdb;
+mysql> quit;
+mysql  -uroot   -p999   <  /root/bbsdb.sql
+
+
+把171配置为主（master）数据库服务器
+vim /etc/my.cnf
+[mysqld]
+log-bin=master171
+server_id=171
+:wq
+
+service   mysql  restart
+
+mysql  -uroot   -p123
+mysql>  grant     replication    slave  on   *.*   to   slaveuser@"172.40.50.107"  identified   by  "123456";
+
+mysql> mysql> show master status\G;
+*************************** 1. row ***************************
+             File: master171.000001
+         Position: 335
+     Binlog_Do_DB: 
+ Binlog_Ignore_DB: 
+Executed_Gtid_Set: 
+1 row in set (0.00 sec)
+
+ERROR: 
+No query specified
+
+mysql> 
+
+配置从数据库服务器 107
+mysql   -h172.40.50.171   -uslaveuser  -
+
+p123456
+mysql>  quit;
+
+vim  /etc/my.cnf
+[mysqld]
+server_id=107
+log-bin=jing     #可选项
+:wq
+service  mysql   restart
+
+mysql   -uroot   -p999
+mysql> show slave status;
+Empty set (0.00 sec)
+
+mysql> change  master   to   
+
+master_host="172.40.50.171",
+master_user="slaveuser",master_password
+
+="123456",master_log_file="master171.00
+
+0001",master_log_pos=335;
+
+mysql> start slave;
+
+mysql> show slave status\G;
+              Slave_IO_Running: Yes
+              Slave_SQL_Running: Yes
+
+
+
+171验证配置
+mysql   -uroot   -p123
+mysql>grant  all on  *.*  to  jingyaya@"%"  identified by "123";
+
+主从同步的工作过程
+
+Slave_IO_Running: Yes （IO线程） 负责把主数据库服务器binlog日志里的sql命令拷贝到本机的中继日志文件里。
+
+IO线程  No状态的原因？
+从数据库服务器连接不上主数据库服务器
+ping     iptables   selinux     连接的授权用户  binlog日志文件指定错误  binlog日志pos点位置错误
+
+查看报错信息
+Last_IO_Error:  报错信息
+ 
+修改错误：
+stop  slave;
+change  master   to    选项="值"；
+start  slave;
+
+
+Slave_SQL_Running: Yes（SQL线程） 执行本机中继日志文件里的sql命令，把数据写进本机的库里。
+
+IO线程  No状态的原因？
+执行本机中继日志文件里的sql命令时，本机没有命令使用到的库 表 或字段。
+
+查看报错信息
+Last_SQL_Error:   报错信息 
+
+
+ls  /var/lib/mysql/
+master.info    记录连接主数据库服务器配置信息
+relay-log.info  记录中继日志信息文件
+mail-relay-bin.00000x   中继日志文件
+mail-relay-bin.index      中继日志的索引文件
+
+主从同步结构模式：
+一主一从   *
+一主多从   *
+主从从
+主主结构
+
++++++++++++++++++++++++++
+day05课程内容回顾：
+数据的备份与数据恢复
+备份方式 ？
+物理备份：   cp     tar     mysqlhotcopy  
+逻辑备份：   备份时把库表记录对应sql命令保
+
+存                 到备份文件
+
+备份策略？
+完全备份   mysqldump
+增量备份   binlog
+差异备份
+
+
+binlog使用：
+binlog日志 ？  启用 ？  查看内容 ？
+记录sql命令的方法？
+手动生成新的binlog日志文件？
+删除已有的binlog日志文件？
+执行binlog日志文件sql命令恢复数据？
+XtraBackup 备份
+mysql主从同步
+++++++++++++++++++++++++++++++++++++++++++++++++++
+day06
+mysql主从同步常用配置参数
+vim /etc/my.cnf
+[mysqld]
+.....
+:wq
+service  mysql  restart
+
+主数据库服务器的使用参数
+binlog-do-db=数据库名，数据库名     #只允许同步的库
+                         
+binlog-ignore-db=数据库名，数据库名  #只不允许同步的库
+
+
+从数据库服务器的使用参数：
+log-slave-updates  级联复制
+replicate-do-db=数据库名，数据库名  #只同步的库
+replicate-ignore-db=数据库名，数据库名  #只不同步的库
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+使用mysql代理服务实现数据读写分离
+
+                              客户端
+                                |
+                              代理117
+                                |
+				|
+		-------------------------------------
+                    |				|
+               写117                           读107            
+
+              
+在117主机上运行mysql代理服务。
+服务运行时，把接收到的读请求给后端的数据库服务器107   把接收到的写请求给后端的数据库服务器171
+
+117：
+#rpm  -qa  | grep  -i mysql-server
+
+#netstat -utnalp  | grep :3306
+
+#service  mysql  stop ; chkconfig  mysql off
+
+#tar -zxvf   mysql-proxy-tar.gz
+
+#mv mysql-proxy-0.8.3-linux-rhel5-x86-64bit/  /usr/local/mysqlproxy
+
+# rpm  -q  lua
+
+#chmod  +x /usr/local/mysqlproxy/share/doc/mysql-proxy/rw-splitting.lua
+
+启动mysql代理服务
+/usr/local/mysqlproxy/bin/mysql-proxy -P 172.40.50.117:3306  -r 172.40.50.107:3306  -b 172.40.50.171:3306  -s  /usr/local/mysqlproxy/share/doc/mysql-proxy/rw-splitting.lua    &
+
+[root@room9pc00 ~]# netstat -utnalp  | grep :3306
+tcp        0      0 172.40.50.117:3306          0.0.0.0:*                   LISTEN      32524/mysql-proxy   
+[root@room9pc00 ~]#
+ 
+停止服务
+pkill -9 mysql-proxy
+kill   -9   %后台运行编号
+
+107  +   171
+mysql   -uroot   -p密码
+mysql> grant all  on   *.*  to  jim@"%"  identified  by "123";
+
+
+
+客户端访问
+mysql   -h172.40.50.117   -ujim   -p123
+mysql> select   * from  gamedb.a;   -> 107
+mysql> insert  gamedb.a  values(88);-> 171
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+day07 
+部署mysql高可用集群。
+mysql  MMM   +  mysql主从同步
+
+环境配置：
+4台数据库服务器    171    107     99    23
+service  mysql  start
+mysql   -uroot   -p密码
+把多余库都删除只留默认的4个数据库
+
+下载软件包 mysql-mmm.zip
+配置yum源
+yum   -y   install  perl-*
+
+
+二 、mysql主从同步：
+
+2.1    171    和  107  配置为主主结构
+
+171配置为107的主
+171：
+grant   replication  slave  on  *.*  to slaveuser@"%"  identified  by "123456";
+
+[root@stu mysql]# cat /etc/my.cnf 
+[mysqld]
+log-bin=master171
+server_id=171
+[root@stu mysql]# service  mysql restart
+
+107:
+grant   replication  slave  on  *.*  to slaveuser@"%"  identified  by "123456";
+vim /etc/my.cnf
+[mysqld]
+server_id=107
+log-bin=master107
+log-slave-updates
+:wq
+
+[root@stu mysql]# service  mysql restart
+
+mysql  -uroot  -p999
+mysql> change master  to  master_host="172.40.50.171",master_user="slaveuser",master_password="123456",master_log_file="master171.000001",master_log_pos=120;
+mysql> start slave;
+mysql> show  slave status\G;
+
+171: 把自己设置为107的从库
+mysql  -uroot  -p999
+mysql> change master  to  master_host="172.40.50.107",master_user="slaveuser",master_password="123456",master_log_file="master107.000001",master_log_pos=120;
+mysql> start  slave;
+mysql> show  slave status\G;
+
+2.2   99  和  23  同时配置为 107 的从库
+99：
+vim  /etc/my.cnf
+[mysqld]
+server_id=99
+:wq
+
+/etc/init.d/mysql restart
+mysql  -uroot  -p123        
+mysql> change master  to  master_host="172.40.50.107",master_user="slaveuser",master_password="123456",master_log_file="master107.000001",master_log_pos=120;
+mysql>  start  slave;
+mysql>  show slave status\G;
+
+23：
+vim  /etc/my.cnf
+[mysqld]
+server_id=23
+:wq
+/etc/init.d/mysql restart
+mysql  -uroot  -p123        
+mysql> change master  to  master_host="172.40.50.107",master_user="slaveuser",master_password="123456",master_log_file="master107.000001",master_log_pos=120;
+mysql>  start  slave;
+mysql>  show slave status\G;
+
+三、测试主从同步的配置
+171 :  
+mysql  -uroot  -p999
+mysql>  grant all on  bbsdb.*  to  lili@"%" identified   by "123";
+
+107  /  99   /  23  : 
+select  user,host from mysql.user  where  user="lili";
+
+
+什么是集群？  使用一组服务器提供相同服务
+
+高可用集群？  主备
+负载均衡集群？多台服务器平均分摊客户端的访问请求。
+
+
+四  安装MySQL  MMM  
+软件介绍：MySQL主主复制管理器
+监控、故障转移    一套脚本套件(perl)
+
+提供2种服务：
+mmm-monitor： 负责所有的监控工作， 决定故障节点的移除或恢复 。
+
+mmm-agent   运行在MySQL服务器上，提供简单远程服务集、提供给监控节点。
+
+在所以主机上安装mysql mmm 软件 (4台数据库服务器 +  监控服务器)
+#tar  -zxvf  mysql-mmm-2.2.1.tar.gz
+#cd mysql-mmm-2.2.1
+#make install
+#cd /etc/mysql-mmm
+#ls  *.conf
+mmm_agent.conf   mmm_mon.conf
+mmm_common.conf  mmm_tools.conf
+
+在四台数据库服务器上做如下授权
+mysql>grant  replication client,process,super on *.*  to     agent@"%"  identified by   "123456";
+
+
+
+七 在所以主机上 安装服务运行时依赖的软件包。
+[root@stu mysql-mmm]# cat /root/a.sh 
+tar -zxvf Algorithm-Diff-1.1902.tar.gz 
+ls
+cd Algorithm-Diff-1.1902
+perl Makefile.PL 
+make
+make install
+cd ..
+rpm -ivh  --nodeps perl-Log-Log4perl-1.26-1.el6.rf.noarch.rpm
+tar -zxvf Proc-Daemon-0.03.tar.gz 
+cd Proc-Daemon-0.03
+perl Makefile.PL 
+make
+make install
+cd ..
+[root@stu mysql-mmm]#
+
+
+八  在4台数据库服务器上安装获取虚拟Ip地址程序。
+#yum  -y  install  gcc   gcc-c++
+#gunzip  Net-ARP-1.0.8.tgz
+#tar -xvf Net-ARP-1.0.8.tar  
+#cd  Net-ARP-1.0.8
+#perl   Makefile.PL
+#make
+#make  install
+
+
+
+
+启动服务
+1  启动数据库服务器上mmm-agent 服务
+[root@stu mysql-mmm]# /etc/init.d/mysql-mmm-agent start
+Daemon bin: '/usr/sbin/mmm_agentd'
+Daemon pid: '/var/run/mmm_agentd.pid'
+Starting MMM Agent daemon... Ok
+[root@stu mysql-mmm]# netstat -utnalp  | grep agent
+tcp        0      0 172.40.50.171:9989          0.0.0.0:*                   LISTEN      24009/mmm_agentd    
+[root@stu mysql-mmm]# netstat -utnalp  | grep :9989
+tcp        0      0 172.40.50.171:9989          0.0.0.0:*                   LISTEN      24009/mmm_agentd    
+[root@stu mysql-mmm]#
+
+日志文件  /var/log/mysql-
+
+mmm/mmm_agentd.log
+
+2  启动监控服务器上mmm-monitor 服务
+[root@stu mysql-mmm]# 
+
+/etc/init.d/mysql-mmm-monitor start
+Daemon bin: '/usr/sbin/mmm_mond'
+Daemon pid: '/var/run/mmm_mond.pid'
+Starting MMM Monitor daemon: Ok
+[root@stu mysql-mmm]# 
+[root@stu mysql-mmm]# netstat -utnalp  | grep :9988
+tcp        0      0 172.40.50.177:9988          0.0.0.0:*                   LISTEN      23544/mmm_mond      
+[root@stu mysql-mmm]#
+
+
+
+测试配置
+177 查看数据库服务器的状态：
+[root@stu mysql-mmm]# mmm_control 
+
+show
+  master107(172.40.50.107) 
+
+master/AWAITING_RECOVERY. Roles: 
+  master171(172.40.50.171) 
+
+master/AWAITING_RECOVERY. Roles: 
+  slave23(172.40.50.23) 
+
+slave/AWAITING_RECOVERY. Roles: 
+  slave99(172.40.50.99) 
+
+slave/AWAITING_RECOVERY. Roles: 
+
+[root@stu mysql-mmm]# 
+
+[root@stu mysql-mmm]# mmm_control 
+
+set_online master171
+OK: State of 'master171' changed to 
+
+ONLINE. Now you can wait some time and 
+
+check its new roles!
+[root@stu mysql-mmm]# 
+
+[root@stu mysql-mmm]# mmm_control 
+
+set_online master107
+OK: State of 'master107' changed to 
+
+ONLINE. Now you can wait some time and 
+
+check its new roles!
+[root@stu mysql-mmm]# 
+
+[root@stu mysql-mmm]# mmm_control 
+
+show
+  master107(172.40.50.107) 
+
+master/ONLINE. Roles: 
+  master171(172.40.50.171) 
+
+master/ONLINE. Roles: writer
+
+(172.40.50.100)
+  slave23(172.40.50.23) 
+
+slave/AWAITING_RECOVERY. Roles: 
+  slave99(172.40.50.99) 
+
+slave/AWAITING_RECOVERY. Roles: 
+
+[root@stu mysql-mmm]# 
+[root@stu mysql-mmm]# mmm_control 
+
+set_online slave99
+OK: State of 'slave99' changed to ONLINE. 
+
+Now you can wait some time and check its 
+
+new roles!
+[root@stu mysql-mmm]# mmm_control 
+
+set_online slave23
+OK: State of 'slave23' changed to ONLINE. 
+
+Now you can wait some time and check its 
+
+new roles!
+[root@stu mysql-mmm]# 
+
+[root@stu mysql-mmm]# mmm_control 
+
+show
+  master107(172.40.50.107) 
+
+master/ONLINE. Roles: 
+  master171(172.40.50.171) 
+
+master/ONLINE. Roles: writer
+
+(172.40.50.100)
+  slave23(172.40.50.23) slave/ONLINE. 
+
+Roles: reader(172.40.50.102)
+  slave99(172.40.50.99) slave/ONLINE. 
+
+Roles: reader(172.40.50.101)
+
+[root@stu mysql-mmm]#
+
+
+查看虚拟ip地址
+[root@stu Net-ARP-1.0.8]# ip addr show | grep eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    inet 172.40.50.171/24 brd 172.40.50.255 scope global eth0
+    inet 172.40.50.100/32 scope global eth0
+[root@stu Net-ARP-1.0.8]#
+
+
+
+
+客户端连接虚拟IP地址172.40.50.100 访问数据库服务器
+mysql  -h172.40.50.100  -ulili  -p123
+mysql>
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+mysql性能优化：
+(当一数据库服务器处理客户端的请求慢时可能由那些原因造成。)
+
+网络带宽太窄 ？  测速软件
+服务配置低(CPU  内存  硬盘)？
+                 查看硬件设备的使用率
+                  top   uptime   df   -h    free -m
+   
+提供数据库服务软件的版本太低   ？       
+查看mysql数据库服务运行时，运行参数。
+
+数据库服务器处理查询请求过程？
+
+mysql>show  variables  like  '%commit%';
+mysql>set   [global] 变量名=值;
+
+vim /etc/my.cnf
+[mysqld]
+变量名=值
+:wq
+
+1 并发连接数
+mysql> set global max_connections=200;
+mysql> show variables  like 
+
+"max_connections";
+
+mysql> show  processlist;
+
+mysql>show   global  status   like  "%
+
+used%";
+
+Max_used_connections/max_connections
+
+=0.85  *  100%  =85%
+
+
+2连接超时时间
+connect_timeout  建立连接   tcp三次握手的
+
+超时时间
+
+wait_timeout 建立连接后等待执行SQL命令的
+
+超时时间
+show  variables like  "%timeout%"；
+
+3 可用重复使用的线程数量
+thread_cache_size=2
+
+4  显示与查询相关的参数的设置
+show  variables  like "query_cache%";
+
+query_cache_type    = 0 /  1  /  2 
+
+1  
+2   select  关键字  * from a;
+
+query_cache_wlock_invalidate | OFF
+ myisam
+
+pc1 :  select  name  from a where  name="jim";
+   
+                name="jim"
+
+
+pc2     select   name from a where name="jim";
+
+
+pc3   update  a  set  name="lucy" where name="jim";
+
+脏读
+
+T   G  M  k        字节    位
+  
+
+显示查询缓存的统计信息？
+show  global  status  like  "qcache%";
+
+ Qcache_hits                | 80       |
+| Qcache_inserts          | 1000       |
+
+
+给执行不同查询请求的进程分配资源
+mysqld  线程
+
+select  * from  a;  read_buffer_size
+
+select  * from  a  order  by   age  desc;  sort_buffer_size
+
+
+select  * from  a  where  工资>1w  group by    部门 ;   read_rnd_buffer_size
+
+select name,age  from  a  where  name like "a%";  key_buffer-size
+
+程序员编写的访问数据库的sql命令太复杂导致数据库服务器处理速度慢？
+启用MySQL服务慢查询日志 ，记录超过指定时间显示查询结果的SQL命令。
+
+mysql数据库服务日志类型4种：
+错误日志 ：  默认就开启，记录服务在启动和运行过程中产生的错误信息。
+
+binlog日志:
+
+查询日志： 记录客户端连接数据库服务器后，执行的所有的SQL命令。
+general-log
+general-log-file=名
+
+慢查询日志：记录客户端连接数据库服务器后，超过指定时间（10秒）显示查询结果的sql命令。
+slow-query-log
+
+vim  /etc/my.cnf
+[mysqld]
+slow-query-log
+general-log
+#slow-query-log-file=名
+#long-query-time=5
+#log-queries-not-using-indexes
+:wq
+/etc/init.d/mysql   restart
+
+select   sleep(5);
+select  sleep(11);
+select  sleep(13);
+
+mysqldumpslow  数据库目录/主机名-slow.log   >  /tmp/sql.txt
+
+cat   数据库目录/主机名-slow.log 
+
+
+网络结构有问题  ？
+                   网络中存在单点故障
+                   数据传输有瓶颈

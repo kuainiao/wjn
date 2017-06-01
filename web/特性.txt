@@ -1,0 +1,11 @@
+懂一个擅长且强大的
+
+Apache是Web服务器，Tomcat是应用（Java）服务器。Tomcat在中小型系统和并发访问用户不是很多的场合下被普遍使用。Apache支持静态页，Tomcat支持动态的。
+
+Nginx是目前性能最高的HTTP服务器。采取了分阶段资源分配技术，其特点是占有内存少，并发能力强。Nginx代码完全用C语言从头写成。
+http://www.nginx.cn/doc/
+
+
+
+FLASK框架本身只包含路由分发，请求和响应的封装和插件系统，在加上作者自己的Werkzeug(处理WSGI)、jinja2(模板引擎)和Flask-SQLAlchemy扩展（Model层），这几个同一个作者的项目构成一个完整的MVC框架。对于Flask本身，一个微框架，这已经足够了，而且它也只能提供这么多。如果你需要表单处理，请安装Flask-WTF；如果你需要基于命令的开发模式，请安装Flask-Script和Flask-CLI(这是一个Flask1.0的backport模块)；如果你要登陆验证，请装Flask-Login；如果你要后台管理，请装Flask-Admin。什么？！你全部都要？请装Django。
+
