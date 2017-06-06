@@ -1,0 +1,14 @@
+wjn@DESKTOP-ER8QSKE MINGW64 /d/git/daima (master)
+$ git remote add origin ssh://git@104.194.81.189:27900/tmp/git/ma.git
+
+wjn@DESKTOP-ER8QSKE MINGW64 /d/git/daima (master)
+$ git push origin master
+git@104.194.81.189's password:
+Counting objects: 227, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (219/219), done.
+Writing objects: 100% (227/227), 151.06 MiB | 173.00 KiB/s, done.
+Total 227 (delta 25), reused 0 (delta 0)
+To ssh://104.194.81.189:27900/tmp/git/ma.git
+ * [new branch]      master -> master
+
