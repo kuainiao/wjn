@@ -2,6 +2,14 @@
 ffmpeg -i test01.mp4 -i test02.mp4 -i test03.mp4 -i test04.mp4 -filter_complex "[0:v]pad=iw*2:ih*2[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h" -ar 22050 out25.flv
 
 
+<<<<<<< HEAD
 九个视频拼接
+=======
+
+
+九个视频拼接
+ffmpeg -i test01.mp4 -i test02.mp4 -i test03.mp4 -i test04.mp4 -i test05.mp4 -i test06.mp4 -i test07.mp4 -i test08.mp4 -i test09.mp4 -filter_complex "[0:v]pad=iw*3:ih*3[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h[d];[d][4:v]overlay=w*2[e];[e][5:v]overlay=w*2:h[f];[f][6:v]overlay=0:h*3[g];[g][7:v]overlay=w:h*2[h];[h][8:v]overlay=w*2:h*2" -ar 22050 out26.flv
+
+>>>>>>> 483d105476d1ef51f68ab04f6ca1047b7163d368
 
 ffmpeg -i test01.mp4 -i test02.mp4 -i test03.mp4 -i test04.mp4 -i test05.mp4 -i test06.mp4 -i test07.mp4 -i test08.mp4 -i test09.mp4 -filter_complex "[0:v]pad=iw*3:ih*3[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h[d];[d][4:v]overlay=w*2[e];[e][5:v]overlay=w*2:h[f];[f][6:v]overlay=0:h*2[g];[g][7:v]overlay=w:h*2[h];[h][8:v]overlay=w*2:h*2" -ar 22050 out27.flv
