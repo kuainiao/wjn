@@ -35,10 +35,6 @@ ffmpeg –s w*h –pix_fmt yuv420p –i input.yuv –vcodec mpeg4 output.avi
 
 ------------------------------------------------------------------------
 
-----------------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
 1、将文件当做直播送至live
 
 ffmpeg -re -i localFile.mp4 -c copy -f flv rtmp://server/live/streamName
@@ -76,58 +72,62 @@ ffmpeg.exe -i INPUT.jpg -an -vcodec libx264 -coder 1 -flags +loop -cmp +chroma -
 
 ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv “rtmp://server/live/h264Stream live=1〃
 
-
 ------------------------------------------------------------------------
-
-----------------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------
-
- 
 
 1.采集usb摄像头视频命令：
-
 ffmpeg -t 20 -f vfwcap -i 0 -r 8 -f mp4 cap1111.mp4
-
- 
-
 ./ffmpeg -t 10 -f vfwcap -i 0 -r 8 -f mp4 cap.mp4
-
 具体说明如下：我们采集10秒，采集设备为vfwcap类型设备，第0个vfwcap采集设备（如果系统有多个vfw的视频采集设备，可以通过-i num来选择），每秒8帧，输出方式为文件，格式为mp4。
-
- 
-
 2.最简单的抓屏：
-
 ffmpeg -f gdigrab -i desktop out.mpg 
-
- 
-
 3.从屏幕的（10,20）点处开始，抓取640x480的屏幕，设定帧率为5 ：
-
 ffmpeg -f gdigrab -framerate 5 -offset_x 10 -offset_y 20 -video_size 640x480 -i desktop out.mpg 
-
- 
-
 4.ffmpeg从视频中生成gif图片：
-
 ffmpeg -i capx.mp4 -t 10 -s 320x240 -pix_fmt rgb24 jidu1.gif
-
- 
-
 5.ffmpeg将图片转换为视频：
-
 http://blog.sina.com.cn/s/blog_40d73279010113c2.html
 
+------------------------------------------------------------------------
+1.获取视频流信息 
+ffprobe -print_format json -show_streams -i input.mp4
+2.多个视频拼接 
+可以将几个视频拼接成一个视频 -f 表示采用concat协议，-c 表示采用什么编码器 copy表示不重新编码，如果是x264 表示将采用x264进行重新编码。
+ffmpeg -y -f concat -i videolist.txt -c copy  output.mp4
+3.视频截图 
+截一张图 
+-ss 表示在视频的多少S 截取一张图
+ffmpeg -y -ss 8 -i input.mp4 -f image2 -vframes 1 output.jpg
+截多张图 
+-r 表示每秒截多少张图； -qscale 表示生成的截图质量，该值越小图片质量越好；%5d.jpg 表示生成的截图的命令规则，5位数的整数命名。
+ffmpeg -y -ss 0 -i input.mp4 -f image2  -r 1 -t 8 -qscale 1 ./jpgs/%5d.jpg
+4.给视频加上水印图片
+ffmpeg -y -i input.mp4  -i ./logo.png filter_complex "overlay=0:0:enable=between(t,0,2)" -c:v libx264 -c:a aac -strict -2 output.mp4
+5.图片合成视频
+ffmpeg -y -f image2 -framerate 10 -i ./jpgs/%05d.jpg -c:v libx264 -r 25 -pix_fmt yuv420p output.mp4
+6.视频添加背景音乐
+ffmpeg -y -i input.mp4 -i ainiyiwannian.wav -filter_complex "[0:a] pan=stereo|c0=1*c0|c1=1*c1 [a1], [1:a] pan=stereo|c0=1*c0|c1=1*c1 [a2],[a1][a2]amix=duration=first,pan=stereo|c0<c0+c1|c1<c2+c3,pan=mono|c0=c0+c1[a]" -map "[a]" -map 0:v -c:v libx264 -c:a aac -strict -2 -ac 2 output.mp4
+7.将视频去除音频
+ffmpeg -y -i source.mp4 -an -vcodec copy output.mp4
+8.设置视频的音量 
+-vol 设置视频的音量，是以%为单位，500表示500%
+ffmpeg -y -i source.mp4 -vol 500 -strict -2 -vcodec copy output.mp4
+9.视频转码 
+-vcodec 指定视频编码器，-acodec 指定音频编码器
+ffmpeg -y -i input.mp4 -vcodec libx264 -acodec copy output.mp4
+
+音频处理
+1.从视频中提取音频
+ffmpeg -y -i source.mp4 -vn output.wav
+2.将音频用lpcm格式重新编码，指定采样率
+ffmpeg -y -i source.wav -acodec pcm_s16le -ar 44100 output.wav
+
+-----------------------------------------------------------------------
 
 
 
 
 
-
-
-
-
+------------------------------------------------------------------------
 
 转发：
 ffmpeg -re -i rtmp://9463.liveplay.myqcloud.com/live/9463_fcfa70cd3ad411e791eae435c87f075e -c copy  -f flv rtmp://9463.livepush.myqcloud.com/live/9463_a6edbb4a3ae711e791eae435c87f075e?bizid=9463
@@ -142,7 +142,7 @@ do
 done
 
 保存为本地文件：
-ffmpeg -i http://9463.liveplay.myqcloud.com/live/9463_fcfa70cd3ad411e791eae435c87f075e.m3u8  out.flv
+ffmpeg -i http://9463.liveplay.myqcloud.com/live/9463_fcfa70cd3ad411e791eae435c87f075e.m3u8 -c copy out.flv
 
 
 
