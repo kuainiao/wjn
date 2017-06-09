@@ -1,17 +1,18 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*- #
 import pythoncom
 import pyHook
 
 def onMouseEvent(event):
-    print "MessageName:", event.MessageName
-    print "Message:", event.Message
-    print "Position:", event.Position
-    where=event.Position
-    print where
-    x=where[0]
-    y=where[1]
-    print x+y
-    print"---"
+    if "mouse left" in event.MessageName:
+        print "MessageName:", event.MessageName
+        print "WindowName:", event.WindowName
+        print "Position:", event.Position
+        where=event.Position
+        print where
+        x=where[0]
+        y=where[1]
+        print x+y
     return True
 def main():
     hm = pyHook.HookManager()

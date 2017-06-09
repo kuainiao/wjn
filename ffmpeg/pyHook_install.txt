@@ -1,0 +1,14 @@
+pythoncom来自pywin32
+换成32位python,测试有效；64位下安装pywin32 64位后，win32api和win32con导入不成功
+
+
+http://www.lfd.uci.edu/~gohlke/pythonlibs/#pyhook
+
+
+前往http://www.lfd.uci.edu/~gohlke/pythonlibs/#pyhook这个地址下载pyHook-1.5.1-cp27-none-win_amd64.whl这个文件，是64位编译的py2.7版本运行的包。
+
+下载下来后使用压缩软件打开里边有一个pyHook文件夹，该模块就是编译好的了。
+
+进入到python27安装目录下，我的在C:\Python27\Lib\site-packages\pyHook，删除之前安装的pyHook，将刚下载的压缩包中的pyHook复制到安装目录下就好了。很简单吧！
+
+ 

@@ -1,0 +1,37 @@
+四个视频拼接
+ffmpeg -i test01.mp4 -i test02.mp4 -i test03.mp4 -i test04.mp4 -filter_complex "[0:v]pad=iw*2:ih*2[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h" -ar 22050 out25.flv
+九个视频拼接
+ffmpeg -i test01.mp4 -i test02.mp4 -i test03.mp4 -i test04.mp4 -i test05.mp4 -i test06.mp4 -i test07.mp4 -i test08.mp4 -i test09.mp4 -filter_complex "[0:v]pad=iw*3:ih*3[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h[d];[d][4:v]overlay=w*2[e];[e][5:v]overlay=w*2:h[f];[f][6:v]overlay=0:h*2[g];[g][7:v]overlay=w:h*2[h];[h][8:v]overlay=w*2:h*2" -ar 22050 out27.flv
+
+
+AVFilter的基本介绍
+AVFilter的功能十分强大，可以实现对多媒体数据的各种处理，包括时间线编辑、视音频特效滤镜的添加或信号处理，还可以实现多路媒体流的合并或叠加，其丰富程度令人叹为观止。这里主要以视频滤镜为例进行介绍。使用AVFilter可以为单路视频添加单个或多个滤镜，也可以为多路视频分别添加不同的滤镜并且在最后将多路视频合并为一路视频，AVFilter为实现这些功能定义了以下几个概念：
+Filter:代表单个filter
+FilterPad:代表一个filter的输入或输出端口，每个filter都可以有多个输入和多个输出，只有输出pad的filter称为source,只有输入pad的filter称为sink
+FilterLink:若一个filter的输出pad和另一个filter的输入pad名字相同，即认为两个filter之间建立了link
+FilterChain:代表一串相互连接的filters，除了source和sink外，要求每个filter的输入输出pad都有对应的输出和输入pad
+FilterGraph:FilterChain的集合
+
+在FFmpeg命令行工具中使用AVFilter
+在命令行中使用AVFilter需要遵循专门的语法，简单来说，就是每个Filter之间以逗号分隔，每个Filter自己的属性之间以冒号分隔，属性和Filter以等号相连，多个Filter组成一个FilterChain，每个FilterChain之间以分号相隔。AVFilter在命令行工具中对应的是-vf或-af或-filter_complex，前两个分别对应于单路输入的视频滤镜和音频滤镜，最后的filter_complex则对应于有多路输入的情况。除了在FFMpeg命令行工具中使用外，在FFplay中同样也可以使用AVFilter。其他一些关于单双引号、转义符号等更详细的语法参考Filter Documentation
+下面举几个例子
+1、叠加水印
+ffmpeg -i test.flv -vf movie=test.jpg[wm];[in][wm]overlay=5:5[out] out.flv
+2、镜像
+ffmpeg -i test.flv -vf crop=iw/2:ih:0:0,split[left][tmp];[tmp]hflip[right];[left]pad=iw*2[a];[a][right]overlay=w out.flv
+3、调整曲线
+ffmpeg -i test.flv -vf curves=vintage out.flv
+4、多路输入拼接
+ffmpeg -i test1.mp4 -i test2.mp4 -i test3.mp4 -i test4.mp4 -filter_complex "[0:v]pad=iw*2:ih*2[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h" out.mp4
+正如前面所说的，当有多个输入时，需要使用filter_complex
+
+
+
+
+
+
+
+
+
+
+
