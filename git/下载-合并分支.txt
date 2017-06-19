@@ -1,0 +1,80 @@
+查看远程分支：git remote -v。
+git fetch：相当于是从远程获取最新版本到本地，不会自动merge
+	   git fetch origin master:tmp
+	   git diff tmp 
+	   git merge tmp
+git pull：相当于是从远程获取最新版本并merge到本地
+ 	  git pull origin master相当于git fetch 和 git merge
+	  
+   58  git branch -d test2	  
+	  
+	  
+	  
+	  
+   44  git remote -v
+   45  git fetch origin master:test
+   47  git branch
+   48  git diff test
+   50  git status
+   51  git add .
+   52  git commit -m "dd"
+   53  git diff test
+   55  git branch
+   56  git checkout test
+   59  git branch
+   60  git fetch origin master:test2
+   61  git diff test2
+   62  git merge test2
+   63  git branch
+   64  git diff test2
+
+   
+   
+wjn@DESKTOP-PIP11GO MINGW64 /e/gitdb/ma (master)
+$ git push origin master
+git@104.194.81.189's password:
+To ssh://git@104.194.81.189:27900/tmp/git/ma.git
+ ! [rejected]        master -> master (fetch first)
+error: failed to push some refs to 'ssh://git@104.194.81.189:27900/tmp/git/ma.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+wjn@DESKTOP-PIP11GO MINGW64 /e/gitdb/ma (master)
+$ git pull origin master
+git@104.194.81.189's password:
+remote: Counting objects: 5, done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 3 (delta 2), reused 0 (delta 0)
+Unpacking objects: 100% (3/3), done.
+From ssh://104.194.81.189:27900/tmp/git/ma
+ * branch            master     -> FETCH_HEAD
+   dc2ea63..e87289a  master     -> origin/master
+Merge made by the 'recursive' strategy.
+ wjn.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+wjn@DESKTOP-PIP11GO MINGW64 /e/gitdb/ma (master)
+$ git branch
+* master
+
+wjn@DESKTOP-PIP11GO MINGW64 /e/gitdb/ma (master)
+$ git status
+On branch master
+Your branch is ahead of 'origin/master' by 3 commits.
+  (use "git push" to publish your local commits)
+nothing to commit, working directory clean
+
+wjn@DESKTOP-PIP11GO MINGW64 /e/gitdb/ma (master)
+$ git push origin master
+git@104.194.81.189's password:
+Counting objects: 10, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (10/10), done.
+Writing objects: 100% (10/10), 1.66 KiB | 0 bytes/s, done.
+Total 10 (delta 5), reused 0 (delta 0)
+To ssh://git@104.194.81.189:27900/tmp/git/ma.git
+   e87289a..f8a3c57  master -> master
+

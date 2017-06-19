@@ -31,10 +31,7 @@ git diff readme.txt查看变化内容
 2、在本地的仓库下运行命令：
 git remote add origin git@192.168.1.17:/opt/git/test/test.git
 建立连接
-3、提交到本地
-git add .
-git commit -m "aaa"
-4、把本地库的内容推送到远程
+3、把本地库的内容推送到远程
 使用 git push命令，实际上是把当前分支master推送到远程。
 git push -u origin master
 由于远程库是空的，我们第一次推送master分支时，加上了 –u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。
@@ -51,10 +48,39 @@ git fetch：相当于是从远程获取最新版本到本地，不会自动merge
 	   git diff tmp 
 	   git merge tmp
 	   首先从远程的origin的master主分支下载最新的版本到origin/master分支上，然后比较本地的master分支和rigin/master分支的差别，最后进行合并
+	$ git remote -v
+	aa      ssh://git@104.194.81.189:27900/tmp/git/ma.git (fetch)
+	aa      ssh://git@104.194.81.189:27900/tmp/git/ma.git (push)
+	tachao@DESKTOP-PEGC418 /E/gitdb/wjn/daima (master)
+	$ git fetch aa master:tmp
+	git@104.194.81.189's password:
+	From ssh://104.194.81.189:27900/tmp/git/ma
+	 * [new branch]      master     -> tmp
+	tachao@DESKTOP-PEGC418 /E/gitdb/wjn/daima (master)
+	$ git diff tmp
+	tachao@DESKTOP-PEGC418 /E/gitdb/wjn/daima (master)
+	$ git merge tmp
+	Already up-to-date.
+
 git pull：相当于是从远程获取最新版本并merge到本地
  	  git pull origin master相当于git fetch 和 git merge
  	  
 	  
+
+
+
+test ssh
+su git 
+git remote add origin git@192.168.200.129:/home/test2/wjn.git
+
+解决冲突
+
+
+
+
+
+
+
 
 
 
